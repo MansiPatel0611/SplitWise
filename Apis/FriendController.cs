@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,7 +42,26 @@ namespace FinalSplitWise.Apis
             }
         }
 
-        [Route("api/Friend/addFriend/{userid}/{name}/{email}")]
+    [Route("api/Friend/getFriendData/{id}")]
+    [HttpGet("{id}", Name = "GetFriendRoute")]
+    [ProducesResponseType(typeof(FriendResponse), 200)]
+    [ProducesResponseType(typeof(CommonResponse), 400)]
+    public async Task<ActionResult> FriendData(int id)
+    {
+      try
+      {
+        var user = await _frienddata.GetFriendAsync(id);
+        //var user = await _userdata.getUserModelAsync(id);
+        return Ok(user);
+      }
+      catch (Exception exp)
+      {
+        _Logger.LogError(exp.Message);
+        return BadRequest(new CommonResponse { Status = false });
+      }
+    }
+
+    [Route("api/Friend/addFriend/{userid}/{name}/{email}")]
         [HttpPost("{userid}/{name}/{email}")]
         [ProducesResponseType(typeof(CommonResponse), 200)]
         [ProducesResponseType(typeof(CommonResponse), 400)]

@@ -1,8 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
+  <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked> 
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="src\app\Models\Model.ts" />
+    <None Remove="src\app\Services\BillService.ts" />
+    <None Remove="src\app\Services\FriendService.ts" />
+    <None Remove="src\app\Services\GroupService.ts" />
+    <None Remove="src\app\Services\UserService.ts" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
@@ -10,6 +20,15 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="src\app\Models\Model.ts" />
+    <TypeScriptCompile Include="src\app\Services\BillService.ts" />
+    <TypeScriptCompile Include="src\app\Services\FriendService.ts" />
+    <TypeScriptCompile Include="src\app\Services\GroupService.ts" />
+    <TypeScriptCompile Include="src\app\Services\UserService.ts" />
   </ItemGroup>
 
 </Project>

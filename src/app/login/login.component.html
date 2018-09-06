@@ -1,0 +1,27 @@
+<div style="width:auto">
+    <div class="container">
+      <h3>Login to Your Account</h3>
+      <br>
+      <form class="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+            <input type="text" class="form-control" name="Email" [(ngModel)]="user.email_id" placeholder="Email-id">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-eye-open"></i></span>
+            <input type="password" class="form-control" name="password" [(ngModel)]="user.password" placeholder="Password">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-success">Submit</button>
+          <button type="button" class="btn btn-warning" [routerLink]="['/home']">Cancel</button>
+        </div>
+      </form>
+    </div>
+</div>

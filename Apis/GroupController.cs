@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,7 +43,26 @@ namespace FinalSplitWise.Apis
             }
         }
 
-        [Route("api/Group/getGroupData/{groupid}")]
+    [Route("api/Group/getFriendGroups/{userid}/{friendid}")]
+    [HttpGet("{userid}/{friendid}")]
+    [ProducesResponseType(typeof(GroupResponse), 200)]
+    [ProducesResponseType(typeof(CommonResponse), 400)]
+    public async Task<ActionResult> GroupFriends(int userid, int friendid)
+    {
+      try
+      {
+        var groups = await _groupdata.GetFriendGroupsAsync(userid, friendid);
+        //var user = await _userdata.getUserModelAsync(id);
+        return Ok(groups);
+      }
+      catch (Exception exp)
+      {
+        _Logger.LogError(exp.Message);
+        return BadRequest(new CommonResponse { Status = false });
+      }
+    }
+
+    [Route("api/Group/getGroupData/{groupid}")]
         [HttpGet("{groupid}")]
         [ProducesResponseType(typeof(GroupResponse), 200)]
         [ProducesResponseType(typeof(CommonResponse), 400)]

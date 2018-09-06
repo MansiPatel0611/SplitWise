@@ -1,0 +1,52 @@
+<div class="container" style="width:auto">
+  <h3>START A NEW GROUP</h3>
+  <br />
+  <div class="col-lg-6">
+    <form class="form" (ngSubmit)="onSubmit()" novalidate>
+      <label>GROUP NAME</label>
+      <input type="text" class="form-control" name="group_name" [(ngModel)]="newGroup.group_name" placeholder="MY GROUP NAME" /><br />
+      <label>GROUP MEMBERS</label>
+      <div>
+        <table class="table" *ngIf='friends && friends.length'>
+          <thead>
+            <tr>
+              <th>People</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let friend of friends">
+            <tr>
+              <td>
+                {{ friend.user_name }}
+              </td>
+              <td>
+                <button type="button" class="btn btn-success" (click)="addclick(friend)">Add</button>
+              </td>
+              <td><button type="button" class="btn btn-danger" (click)="removeclick(friend)">Remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <!--<label style="font-weight:normal">
+        {{ friend.user_name }}
+      </label>
+      <button type="button" class="btn btn-danger">Add</button>-->
+      </div>
+      <button type="submit" class="btn btn-warning">Save</button>
+    </form>
+  </div>
+  <div class="col-lg-6">
+    <div class="container1">
+      <div class="container2">
+        <div style="position:relative;left:10px;top:15px">
+          <label>Members:</label>
+        </div>
+        <div style="position:relative;left:10px;top:15px">
+          <div>
+            <div *ngFor="let member of groupmember">{{member}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

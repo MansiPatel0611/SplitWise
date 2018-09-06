@@ -1,0 +1,51 @@
+.row{
+  height:500px;
+}
+div.navbar{
+  background-color:lightgray;
+  color:grey;
+  height:75px;
+}
+div.navbar1{
+  background-color:lightgray;
+  color:white;
+  height:50px;
+  position:relative;
+}
+.design{
+  align-content:center;
+}
+label.nav-link{
+  border-color:black;
+  background-color:whitesmoke;
+  color:grey
+}
+div.billNav{
+  background-color:whitesmoke;
+}
+label.billNav1.nav-link:hover{
+  background-color:lightgray;
+}
+.myscroll.modal-body {
+  min-height:initial;
+  max-height:300px;
+  overflow-y:scroll;
+}
+.modal{
+  position:fixed;
+  right:100px;
+}
+.payer.modal.fade:not(.in) .modal-dialog{
+    -webkit-transform: translate3d(-25%, 0, 0);
+    transform: translate3d(-25%, 0, 0);
+}
+.payer{
+  left:700px;
+}
+.modal-content{
+  width:300px;
+}
+.modal-header{
+  background-color:grey;
+  color:white;
+}

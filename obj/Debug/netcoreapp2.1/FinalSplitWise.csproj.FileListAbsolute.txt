@@ -3,7 +3,6 @@ C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\bin\Debug\netcoreapp2.
 C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\bin\Debug\netcoreapp2.1\FinalSplitWise.runtimeconfig.dev.json
 C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\bin\Debug\netcoreapp2.1\FinalSplitWise.dll
 C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\bin\Debug\netcoreapp2.1\FinalSplitWise.pdb
-C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\obj\Debug\netcoreapp2.1\FinalSplitWise.csprojAssemblyReference.cache
 C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\obj\Debug\netcoreapp2.1\FinalSplitWise.csproj.CoreCompileInputs.cache
 C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\obj\Debug\netcoreapp2.1\FinalSplitWise.RazorAssemblyInfo.cache
 C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\obj\Debug\netcoreapp2.1\FinalSplitWise.RazorAssemblyInfo.cs
@@ -12,3 +11,4 @@ C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\obj\Debug\netcoreapp2.
 C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\obj\Debug\netcoreapp2.1\FinalSplitWise.RazorTargetAssemblyInfo.cache
 C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\obj\Debug\netcoreapp2.1\FinalSplitWise.dll
 C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\obj\Debug\netcoreapp2.1\FinalSplitWise.pdb
+C:\Users\mansi\source\repos\FinalSplitWise\FinalSplitWise\obj\Debug\netcoreapp2.1\FinalSplitWise.csprojAssemblyReference.cache

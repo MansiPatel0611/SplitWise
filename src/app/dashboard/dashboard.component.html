@@ -1,0 +1,246 @@
+<div class="row">
+  <div class="col-lg-8 border-right border-dark">
+    <div class="navbar navbar-expand-sm">
+      <h3>Dashboard</h3>
+      <button type="button" class="btn btn-success btn-lg" style="position:absolute;left:500px" data-toggle="modal" data-target="#AddBill">Add Bill</button>
+
+      <div class="modal fade" id="AddBill" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Add Bill</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+
+              <div data-toggle="modal" data-target="#BillfriendListModal">
+                <label>
+                  Share with:
+                </label>
+              </div>
+
+              <div>
+
+                <label style="font-weight:normal;background-color:whitesmoke"
+                       *ngFor="let member of billShareWith">
+                  {{ member.name }}
+                  <span class="glyphicon glyphicon-remove" (click)="removeMember(member.id)"></span>
+                </label>
+
+              </div>
+
+              <form class="form" novalidate>
+
+                <div class="form-group">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
+                    <input type="text" class="form-control" [(ngModel)]="addBill.description" name="description" placeholder="Description" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
+                    <input type="text" class="form-control" [(ngModel)]="addBill.total_amount" name="amount" placeholder="00.00" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                    <input type="text" class="form-control" [(ngModel)]="addBill.bill_date" name="date" placeholder="MM-DD-YY" />
+                  </div>
+                </div>
+
+                <div>
+                  Paid By
+                  <button type="button" class="btn" style="background-color:lightgray;border-radius:10px"
+                          data-toggle="modal" data-target="#BillPayer">
+                    {{ paidby }}
+                  </button>
+                </div>
+                <div>
+                  <button type="button" (click)="AddBillData()" class="btn btn-success" data-dismiss="modal">Add</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade payer" id="BillfriendListModal" role="dialog">
+        <div class="modal-dialog">
+
+          <!--Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Select Friends</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <label class="nav-link" style="font-weight:normal"
+                     (click)="AddBillMember(friend.userid,friend.user_name)" *ngFor="let friend of friends">
+                {{friend.user_name}}
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal fade payer" id="BillPayer" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Choose Payer</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body myscroll">
+              <div class="payerlist">
+               
+                <label class="nav-link" style="font-weight:normal"
+                      (click)="addSinglePayer(member.id)" *ngFor="let member of billShareWith">
+                  {{ member.name }}
+                </label>
+                <label class="nav-link" (click)="showpayer()">
+                  Multiple Payers
+                </label>
+                <div *ngIf="showPayer">
+                  <label class="nav-link" style="font-weight:normal" *ngFor="let member of billShareWith">
+                    {{ member.name }}
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
+                      <input type="text" #amt class="form-control" placeholder="0.00" />
+                    </div>
+                    <a (click)="addpayer(member.id,amt.value)">Add</a>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <button type="button" class="btn btn-danger btn-lg" style="position:absolute;left:600px"
+              data-toggle="modal" data-target="#FriendSettleModal">
+        Settle Up
+      </button>
+
+
+      <div class="modal fade" id="FriendSettleModal" role="dialog">
+        <div class="modal-dialog">
+
+          <!--Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Settle Up</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div *ngIf="showInfo">
+                <div>
+                  Choose a payment method
+                </div><br />
+                <div>
+                  <button class="btn btn-success" style="width:250px" (click)="showsett()">Record a cash Payment</button>
+                </div><br />
+                <div>
+                  <button class="btn btn-danger" style="width:250px">Pay via Paypal</button>
+                </div>
+              </div>
+              <div class="design" *ngIf="showSettle">
+                <div>
+                  <span class="glyphicon glyphicon-user" style="font-size:40px;position:relative;left:40px"></span>
+                  <span class="glyphicon glyphicon-arrow-right" style="font-size:30px;position:relative;left:60px"></span>
+                  <span class="glyphicon glyphicon-user" style="font-size:40px;position:relative;left:80px"></span>
+                </div>
+                <div>
+                  <label style="position:relative;left:40px">{{ user.user_name}}</label>
+                  <label style="position:relative;left:60px">paid</label>
+                  <label style="position:relative;left:80px"
+                         data-toggle="modal" data-target="#friendListModal">{{ Pay_to }}</label>
+                </div>
+                <br />
+                <div class="form-group" style="position:relative;left:50px">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
+                    <input type="text" class="form-control" [(ngModel)]="settleAmt" style="width:100px" placeholder="00.00" />
+                  </div>
+                </div>
+                <div>
+                  <button class="btn check" style="position:relative;border-radius:10px;left:40px"
+                          data-toggle="modal" data-target="#groupListModal" (click)="showGroups()">
+                    {{ setAmong }}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-success" (click)="addSettlement()">Save</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="modal fade payer" id="groupListModal" role="dialog">
+        <div class="modal-dialog">
+
+          <!--Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Choose Groups</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <label class="nav-link" style="font-weight:normal" (click)="selectNonGroup()">
+                Non Group
+              </label>
+              <label class="nav-link" style="font-weight:normal" (click)="selectGroup(group.groupid,group.group_name)" *ngFor="let group of groups">
+                {{group.group_name}}
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal fade payer" id="friendListModal" role="dialog">
+        <div class="modal-dialog">
+
+          <!--Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Choose Friends</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <label class="nav-link" style="font-weight:normal"
+                     (click)="selectFriend(friend.userid,friend.user_name)" *ngFor="let friend of friends">
+                {{friend.user_name}}
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+
+   
+
+
+  </div>
+  <div class="col-lg-4">
+    fafadas
+  </div>
+</div>

@@ -1,4 +1,4 @@
-﻿using FinalSplitWise.Data;
+using FinalSplitWise.Data;
 using FinalSplitWise.Models;
 using FinalSplitWise.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -149,11 +149,22 @@ namespace FinalSplitWise.Repositories
 
                         if (settlements != null)
                         {
-                            settlements.payerId = x.payeeId;
-                            settlements.payeeId = x.payerId;
-                            settlements.amount = settlements.amount - x.paid_amount;
-                            _Context.settlements.Attach(settlements);
-                            _Context.Entry(settlements).State = EntityState.Modified;
+              if (settlements.amount > x.paid_amount)
+              {
+                settlements.payerId = x.payeeId;
+                settlements.payeeId = x.payerId;
+                settlements.amount = settlements.amount - x.paid_amount;
+                _Context.settlements.Attach(settlements);
+                _Context.Entry(settlements).State = EntityState.Modified;
+              }
+              else
+              {
+                settlements.payerId = x.payerId;
+                settlements.payeeId = x.payeeId;
+                settlements.amount = x.paid_amount-settlements.amount;
+                _Context.settlements.Attach(settlements);
+                _Context.Entry(settlements).State = EntityState.Modified;
+              }    
                         }
                         else
                         {
@@ -275,7 +286,7 @@ namespace FinalSplitWise.Repositories
         public async Task<BillGetResponse> GetBillAsync(int billid)
         {
             BillGetResponse bill = new BillGetResponse();
-            var bills = _Context.bills.SingleOrDefault(c => c.billid == billid);
+            var bills = await _Context.bills.SingleOrDefaultAsync(c => c.billid == billid);
 
             if (bills.groupId != null)
             {
@@ -344,8 +355,8 @@ namespace FinalSplitWise.Repositories
             var billlist = new List<BillGetResponse>();
 
             var bills = _Context.bills.Where(c =>
-            c.bill_payer.Any(x=>x.paid_byId==userid || x.paid_byId ==friendid) &&
-            c.bill_shared_with.Any(y=>y.shared_withId==userid || y.shared_withId==friendid)).ToList();
+            c.bill_shared_with.Any(y=>y.shared_withId==userid) &&
+            c.bill_shared_with.Any(y => y.shared_withId == friendid)).ToList();
 
             for (var j = 0; j < bills.Count; j++)
             {

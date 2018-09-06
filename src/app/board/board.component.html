@@ -1,0 +1,87 @@
+<div style="height:auto">
+
+  <button style="position:absolute;top:20px;left:1200px" [routerLink]="['/home']" class="btn btn-info">logout</button>
+  <button class="btn btn-secondary" style="color:white;position:absolute;top:20px;left:1270px" [routerLink]="['account/setting']">
+    {{user.user_name}}
+    <span class="glyphicon glyphicon-lg glyphicon-cog"></span>
+  </button>
+  <div class="col-lg-2 border-right border-dark">
+    <nav style=" width:200px" class="navbar flex-column">
+      <div class="nav flex-column">
+        <div class="nav-item">
+          <label class="nav-link" [routerLink]="['dashboard']">
+            <span class="glyphicon glyphicon-tasks"></span>  Dashboard
+          </label>
+        </div>
+        <div class="nav-item">
+          <label class="nav-link"><span class="glyphicon glyphicon-th-list"></span>  All Expense </label>
+        </div>
+
+
+        <div class="nav-item">
+          <label class="nav-link">
+            Groups
+            <span class="glyphicon glyphicon-plus" style="position:relative;left:80px" [routerLink]="['newgroup']"></span>
+          </label>
+          <div>
+            <label class="nav-link list" *ngFor="let group of groups" [routerLink]="['group',group.groupid]">
+              <span class="glyphicon glyphicon-tag"></span> {{ group.group_name }}
+            </label>
+
+          </div>
+        </div>
+
+        <div class="nav-item">
+          <label class="nav-link">
+            Friends
+            <span class="glyphicon glyphicon-plus" style="position:relative;left:80px" data-toggle="modal" data-target="#myModal"></span>
+          </label>
+          <div>
+            <label class="nav-link list" *ngFor="let friend of friends" [routerLink]="['friend',friend.userid]">
+              <span class="glyphicon glyphicon-user"></span>
+              {{ friend.user_name }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Add New Friend</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <form class="form" novalidate>
+
+                <div class="form-group">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                    <input type="text" class="form-control" name="name" [(ngModel)]="frd_name" placeholder="Enter friend Name" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                    <input type="text" class="form-control" name="email" [(ngModel)]="frd_email" placeholder="Enter your Email_id">
+                  </div>
+                </div>
+                <div>
+                  <button type="button" (click)="onSubmit()"  class="btn btn-success" data-dismiss="modal">Add</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </nav>
+  </div>
+  <div class="col-lg-10">
+    <router-outlet></router-outlet>
+  </div>
+</div>

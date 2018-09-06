@@ -1,4 +1,4 @@
-﻿using FinalSplitWise.Models;
+using FinalSplitWise.Models;
 using FinalSplitWise.ResponseModel;
 using System;
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ namespace FinalSplitWise.Repositories
     public interface FriendData
     {
         Task<List<FriendResponse>> GetFriendsAsync(int user_id);
+        Task<FriendResponse> GetFriendAsync(int friend_id);
         Task<Friend> AddNewFriendAsync(string name, string email,int userid);
         Task<bool> RemoveFriendAsync(int userid,int friendid);
     }

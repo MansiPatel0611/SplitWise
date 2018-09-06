@@ -1,4 +1,4 @@
-﻿using FinalSplitWise.Data;
+using FinalSplitWise.Data;
 using FinalSplitWise.Models;
 using FinalSplitWise.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +51,18 @@ namespace FinalSplitWise.Repositories
             return friend;
         }
 
-        public async Task<List<FriendResponse>> GetFriendsAsync(int user_id)
+    public async Task<FriendResponse> GetFriendAsync(int friend_id)
+    {
+      FriendResponse friend = new FriendResponse();
+      var data = await _Context.users.SingleOrDefaultAsync(c => c.userid == friend_id);
+      friend.userid = data.userid;
+      friend.user_name = data.user_name;
+      friend.phone_no = data.phone_no;
+      friend.email_id = data.email_id;
+      return friend;
+    }
+
+    public async Task<List<FriendResponse>> GetFriendsAsync(int user_id)
         {
             var frdlist = new List<FriendResponse>();
             var list =await _Context.friends.Where(c => c.userId == user_id || c.friendId == user_id).ToListAsync();

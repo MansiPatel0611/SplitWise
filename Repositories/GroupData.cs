@@ -1,4 +1,4 @@
-﻿using FinalSplitWise.Models;
+using FinalSplitWise.Models;
 using FinalSplitWise.ResponseModel;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,9 @@ namespace FinalSplitWise.Repositories
 {
     public interface GroupData
     {
-        Task<List<GroupResponse>> GetGroupsAsync(int userid);
+    Task<List<GroupResponse>> GetFriendGroupsAsync(int userid, int friendid);
+
+    Task<List<GroupResponse>> GetGroupsAsync(int userid);
 
         Task<GroupResponse> GetGroupAsync(int groupid);
 

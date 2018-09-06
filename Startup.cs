@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FinalSplitWise.Data;
 using FinalSplitWise.Repositories;
+using FinalSplitWise.SystemHub;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -41,11 +42,20 @@ namespace FinalSplitWise
             services.AddScoped<GroupMemberData, GroupMemberDataSQL>();
             services.AddScoped<BillData, BillDataSQL>();
             services.AddScoped<TransactionData, TransactionDataSQL>();
+      services.AddCors(options =>
+      {
+        options.AddPolicy("CorsPolicy",
+            builder => builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+      });
+      services.AddSignalR();
 
-        }
+    }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -55,8 +65,15 @@ namespace FinalSplitWise
             {
                 app.UseHsts();
             }
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+      app.UseCors("CorsPolicy");
+      app.UseSignalR(routes =>
+      {
+        routes.MapHub<MySystemHub>("/serve");
+      });
+      app.UseHttpsRedirection();
 
-            app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
