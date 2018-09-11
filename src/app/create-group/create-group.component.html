@@ -21,9 +21,9 @@
                 {{ friend.user_name }}
               </td>
               <td>
-                <button type="button" class="btn btn-success" (click)="addclick(friend)">Add</button>
+                <button type="button" id="{{friend.userid}}" class="btn btn-success" (click)="addclick(friend)">Add</button>
               </td>
-              <td><button type="button" class="btn btn-danger" (click)="removeclick(friend)">Remove</button></td>
+              <td><button type="button" id="{{friend.userid}}" class="btn btn-danger" (click)="removeclick(friend)">Remove</button></td>
             </tr>
           </tbody>
         </table>

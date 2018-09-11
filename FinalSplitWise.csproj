@@ -11,6 +11,7 @@
     <None Remove="src\app\Services\BillService.ts" />
     <None Remove="src\app\Services\FriendService.ts" />
     <None Remove="src\app\Services\GroupService.ts" />
+    <None Remove="src\app\Services\HubService.ts" />
     <None Remove="src\app\Services\UserService.ts" />
   </ItemGroup>
 
@@ -28,6 +29,7 @@
     <TypeScriptCompile Include="src\app\Services\BillService.ts" />
     <TypeScriptCompile Include="src\app\Services\FriendService.ts" />
     <TypeScriptCompile Include="src\app\Services\GroupService.ts" />
+    <TypeScriptCompile Include="src\app\Services\HubService.ts" />
     <TypeScriptCompile Include="src\app\Services\UserService.ts" />
   </ItemGroup>
 

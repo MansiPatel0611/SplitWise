@@ -1,5 +1,6 @@
 import { Component,OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
+import { HubConnectionService } from './Services/HubService';
 
 @Component({
   selector: 'app-root',
@@ -8,11 +9,12 @@ import { Router, NavigationEnd } from '@angular/router';
 })
 export class AppComponent {
   title = 'app';
-  constructor(private _router: Router) {
+  constructor(private _router: Router, private service: HubConnectionService) {
 
   }
 
   ngOnInit() {
+   // this.service.update();
 
     this._router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
@@ -23,5 +25,7 @@ export class AppComponent {
         window.scrollTo(0, 0);
       }
     });
+   
+
   }
 }

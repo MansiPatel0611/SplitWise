@@ -27,7 +27,7 @@ webpackEmptyAsyncContext.id = "./src/$$_lazy_route_resource lazy recursive";
 /*!*********************************!*\
   !*** ./src/app/Models/Model.ts ***!
   \*********************************/
-/*! exports provided: User, FriendResponse, Group, CreateGroupResponse, GroupResponse, CommonResponse, GroupMember, Detail, Bill, BillResponse, BillGetResponse, BillDetail, PayerResponse, SharedWithResponse, SettlementResponse, GetSettlementResponse, settle, TransactionGetResponse, TransactionResponse, GroupBalance */
+/*! exports provided: User, FriendResponse, Group, CreateGroupResponse, GroupResponse, CommonResponse, GroupMember, Detail, Bill, BillResponse, BillGetResponse, BillDetail, PayerResponse, SharedWithResponse, SettlementResponse, GetSettlementResponse, settle, TransactionGetResponse, TransactionResponse, GroupBalance, GroupBalanceDetail */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -52,6 +52,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TransactionGetResponse", function() { return TransactionGetResponse; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TransactionResponse", function() { return TransactionResponse; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GroupBalance", function() { return GroupBalance; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GroupBalanceDetail", function() { return GroupBalanceDetail; });
 var User = /** @class */ (function () {
     function User() {
     }
@@ -172,6 +173,12 @@ var GroupBalance = /** @class */ (function () {
     return GroupBalance;
 }());
 
+var GroupBalanceDetail = /** @class */ (function () {
+    function GroupBalanceDetail() {
+    }
+    return GroupBalanceDetail;
+}());
+
 
 
 /***/ }),
@@ -206,6 +213,9 @@ var BillService = /** @class */ (function () {
     BillService.prototype.addNewBill = function (bill) {
         return this.http.post("api/Bill/addBill", bill);
     };
+    BillService.prototype.getUserBills = function (userid) {
+        return this.http.get("api/Bill/allbills/" + userid);
+    };
     BillService.prototype.getGroupBills = function (id) {
         return this.http.get("api/Bill/getGroupBills/" + id);
     };
@@ -220,6 +230,18 @@ var BillService = /** @class */ (function () {
     };
     BillService.prototype.getGroupSettlement = function (userid, groupid) {
         return this.http.get("api/GroupSettlements/" + userid + "/" + groupid);
+    };
+    BillService.prototype.getUserSettlements = function (userid) {
+        return this.http.get("api/userSettlements/" + userid);
+    };
+    BillService.prototype.getFriendTransactions = function (userid, friendid) {
+        return this.http.get("api/frd/expense/" + userid + "/" + friendid);
+    };
+    BillService.prototype.getGroupTransactions = function (groupid) {
+        return this.http.get("api/group/expense/" + groupid);
+    };
+    BillService.prototype.getUserExpenseTransaction = function (userid) {
+        return this.http.get("api/all/expense/" + userid);
     };
     BillService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
@@ -267,6 +289,9 @@ var FriendService = /** @class */ (function () {
     };
     FriendService.prototype.removeFriend = function (userid, friendid) {
         return this.http.delete("api/Friend/removeFriend/" + userid + "/" + friendid);
+    };
+    FriendService.prototype.addFriend = function (userid, friendid) {
+        return this.http.post("api/Friend/addNewFriend/", userid + "/" + friendid);
     };
     FriendService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
@@ -332,6 +357,57 @@ var GroupService = /** @class */ (function () {
         __metadata("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpClient"]])
     ], GroupService);
     return GroupService;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/Services/HubService.ts":
+/*!****************************************!*\
+  !*** ./src/app/Services/HubService.ts ***!
+  \****************************************/
+/*! exports provided: HubConnectionService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HubConnectionService", function() { return HubConnectionService; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _aspnet_signalr__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @aspnet/signalr */ "./node_modules/@aspnet/signalr/dist/esm/index.js");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+var HubConnectionService = /** @class */ (function () {
+    function HubConnectionService() {
+        this.init();
+    }
+    HubConnectionService.prototype.update = function () {
+        this._hubConnection.invoke('SendToAll');
+    };
+    HubConnectionService.prototype.init = function () {
+        this._hubConnection = new _aspnet_signalr__WEBPACK_IMPORTED_MODULE_1__["HubConnectionBuilder"]()
+            .withUrl('/serve')
+            .configureLogging(_aspnet_signalr__WEBPACK_IMPORTED_MODULE_1__["LogLevel"].Information).build();
+        this._hubConnection
+            .start()
+            .then(function () { return console.log('Connection started!'); })
+            .catch(function (err) { return console.log('Error while establishing connection :'); });
+        this._hubConnection.on('send', function () { });
+    };
+    HubConnectionService = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
+        __metadata("design:paramtypes", [])
+    ], HubConnectionService);
+    return HubConnectionService;
 }());
 
 
@@ -404,7 +480,7 @@ var UserService = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ""
+module.exports = "\r\n"
 
 /***/ }),
 
@@ -431,6 +507,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppComponent", function() { return AppComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
+/* harmony import */ var _Services_HubService__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Services/HubService */ "./src/app/Services/HubService.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -442,12 +519,15 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 };
 
 
+
 var AppComponent = /** @class */ (function () {
-    function AppComponent(_router) {
+    function AppComponent(_router, service) {
         this._router = _router;
+        this.service = service;
         this.title = 'app';
     }
     AppComponent.prototype.ngOnInit = function () {
+        // this.service.update();
         var _this = this;
         this._router.routeReuseStrategy.shouldReuseRoute = function () {
             return false;
@@ -465,7 +545,7 @@ var AppComponent = /** @class */ (function () {
             template: __webpack_require__(/*! ./app.component.html */ "./src/app/app.component.html"),
             styles: [__webpack_require__(/*! ./app.component.css */ "./src/app/app.component.css")]
         }),
-        __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"]])
+        __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"], _Services_HubService__WEBPACK_IMPORTED_MODULE_2__["HubConnectionService"]])
     ], AppComponent);
     return AppComponent;
 }());
@@ -553,7 +633,7 @@ var AppModule = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "label.nav-link{\r\n  border-color:black;\r\n  background-color:grey;\r\n  color:white;\r\n}\r\ndiv.nav-item{\r\n  width:180px;\r\n}\r\nnav.navbar{\r\n  background-color:whitesmoke;\r\n}\r\nlabel.list{\r\n  background-color:darkgrey;\r\n}\r\n.modal-content{\r\n  width:300px;\r\n}\r\n.form-control{\r\n  width:auto;\r\n}\r\n"
+module.exports = "label.nav-link{\r\n  border-color:black;\r\n  background-color:grey;\r\n  color:white;\r\n}\r\ndiv.nav-item{\r\n  width:180px;\r\n}\r\nnav.navbar{\r\n  background-color:whitesmoke;\r\n}\r\nlabel.list{\r\n  background-color:darkgrey;\r\n}\r\n.modal-content{\r\n  width:300px;\r\n}\r\n.form-control{\r\n  width:auto;\r\n}\r\n.myrouter{\r\n  min-height:initial;\r\n  max-height:500px;\r\n  overflow-y:scroll;\r\n}\r\n\r\n"
 
 /***/ }),
 
@@ -564,7 +644,7 @@ module.exports = "label.nav-link{\r\n  border-color:black;\r\n  background-color
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div style=\"height:auto\">\r\n\r\n  <button style=\"position:absolute;top:20px;left:1200px\" [routerLink]=\"['/home']\" class=\"btn btn-info\">logout</button>\r\n  <button class=\"btn btn-secondary\" style=\"color:white;position:absolute;top:20px;left:1270px\" [routerLink]=\"['account/setting']\">\r\n    {{user.user_name}}\r\n    <span class=\"glyphicon glyphicon-lg glyphicon-cog\"></span>\r\n  </button>\r\n  <div class=\"col-lg-2 border-right border-dark\">\r\n    <nav style=\" width:200px\" class=\"navbar flex-column\">\r\n      <div class=\"nav flex-column\">\r\n        <div class=\"nav-item\">\r\n          <label class=\"nav-link\" [routerLink]=\"['dashboard']\">\r\n            <span class=\"glyphicon glyphicon-tasks\"></span>  Dashboard\r\n          </label>\r\n        </div>\r\n        <div class=\"nav-item\">\r\n          <label class=\"nav-link\"><span class=\"glyphicon glyphicon-th-list\"></span>  All Expense </label>\r\n        </div>\r\n\r\n\r\n        <div class=\"nav-item\">\r\n          <label class=\"nav-link\">\r\n            Groups\r\n            <span class=\"glyphicon glyphicon-plus\" style=\"position:relative;left:80px\" [routerLink]=\"['newgroup']\"></span>\r\n          </label>\r\n          <div>\r\n            <label class=\"nav-link list\" *ngFor=\"let group of groups\" [routerLink]=\"['group',group.groupid]\">\r\n              <span class=\"glyphicon glyphicon-tag\"></span> {{ group.group_name }}\r\n            </label>\r\n\r\n          </div>\r\n        </div>\r\n\r\n        <div class=\"nav-item\">\r\n          <label class=\"nav-link\">\r\n            Friends\r\n            <span class=\"glyphicon glyphicon-plus\" style=\"position:relative;left:80px\" data-toggle=\"modal\" data-target=\"#myModal\"></span>\r\n          </label>\r\n          <div>\r\n            <label class=\"nav-link list\" *ngFor=\"let friend of friends\" [routerLink]=\"['friend',friend.userid]\">\r\n              <span class=\"glyphicon glyphicon-user\"></span>\r\n              {{ friend.user_name }}\r\n            </label>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <div class=\"modal fade\" id=\"myModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Add New Friend</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <form class=\"form\" novalidate>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-user\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"name\" [(ngModel)]=\"frd_name\" placeholder=\"Enter friend Name\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-envelope\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"email\" [(ngModel)]=\"frd_email\" placeholder=\"Enter your Email_id\">\r\n                  </div>\r\n                </div>\r\n                <div>\r\n                  <button type=\"button\" (click)=\"onSubmit()\"  class=\"btn btn-success\" data-dismiss=\"modal\">Add</button>\r\n                </div>\r\n              </form>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n    </nav>\r\n  </div>\r\n  <div class=\"col-lg-10\">\r\n    <router-outlet></router-outlet>\r\n  </div>\r\n</div>\r\n"
+module.exports = "<div style=\"height:auto\">\r\n\r\n  <button style=\"position:absolute;top:25px;left:1000px;width:100px\" [routerLink]=\"['/home']\" class=\"btn btn-info\">logout</button>\r\n  <button class=\"btn btn-secondary\" style=\"color:white;position:absolute;top:25px;left:1111px;width:100px\" [routerLink]=\"['account/setting']\">\r\n    {{user.user_name}}\r\n    <span class=\"glyphicon glyphicon-lg glyphicon-cog\"></span>\r\n  </button>\r\n\r\n  <div class=\"col-lg-2 border-right border-dark\" style=\"height:550px;overflow-y:scroll\">\r\n    <nav style=\" width:190px\" class=\"navbar flex-column\">\r\n      <div class=\"nav flex-column\">\r\n        <div class=\"nav-item\">\r\n          <label class=\"nav-link\" [routerLink]=\"['dashboard']\">\r\n            <span class=\"glyphicon glyphicon-tasks\"></span>  Dashboard\r\n          </label>\r\n        </div>\r\n        <div class=\"nav-item\" [routerLink]=\"['expense']\">\r\n          <label class=\"nav-link\"><span class=\"glyphicon glyphicon-th-list\"></span>  All Expense </label>\r\n        </div>\r\n\r\n\r\n        <div class=\"nav-item\">\r\n          <label class=\"nav-link\">\r\n            Groups\r\n            <span class=\"glyphicon glyphicon-plus\" style=\"position:relative;left:80px\" [routerLink]=\"['newgroup']\"></span>\r\n          </label>\r\n          <div>\r\n            <label class=\"nav-link list\" *ngFor=\"let group of groups\" [routerLink]=\"['group',group.groupid]\">\r\n              <span class=\"glyphicon glyphicon-tag\"></span> {{ group.group_name }}\r\n            </label>\r\n\r\n          </div>\r\n        </div>\r\n\r\n        <div class=\"nav-item\">\r\n          <label class=\"nav-link\">\r\n            Friends\r\n            <span class=\"glyphicon glyphicon-plus\" style=\"position:relative;left:80px\" data-toggle=\"modal\" data-target=\"#myModal\"></span>\r\n          </label>\r\n          <div>\r\n            <label class=\"nav-link list\" *ngFor=\"let friend of friends\" [routerLink]=\"['friend',friend.userid]\">\r\n              <span class=\"glyphicon glyphicon-user\"></span>\r\n              {{ friend.user_name }}\r\n            </label>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <div class=\"modal fade\" id=\"myModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Add New Friend</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <form class=\"form\" novalidate>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-user\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"name\" [(ngModel)]=\"frd_name\" placeholder=\"Enter friend Name\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-envelope\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"email\" [(ngModel)]=\"frd_email\" placeholder=\"Enter your Email_id\">\r\n                  </div>\r\n                </div>\r\n                <div>\r\n                  <button type=\"button\" (click)=\"onSubmit()\"  class=\"btn btn-success\" data-dismiss=\"modal\">Add</button>\r\n                </div>\r\n              </form>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n    </nav>\r\n  </div>\r\n  <div class=\"col-lg-10 myrouter\">\r\n    <router-outlet></router-outlet>\r\n  </div>\r\n</div>\r\n"
 
 /***/ }),
 
@@ -632,7 +712,11 @@ var BoardComponent = /** @class */ (function () {
             console.log(data),
                 _this.Label = "hide";
             //  this.router.navigate(['/Board', this.id])
-        }, function (error) { return alert("user does not exist"); });
+        }, function (error) {
+            alert("user does not exist");
+            _this.frd_name = null;
+            _this.frd_email = null;
+        });
     };
     BoardComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -667,7 +751,7 @@ module.exports = ".form-control{\r\n  height:40px;\r\n  width:400px;\r\n}\r\n.ta
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"container\" style=\"width:auto\">\r\n  <h3>START A NEW GROUP</h3>\r\n  <br />\r\n  <div class=\"col-lg-6\">\r\n    <form class=\"form\" (ngSubmit)=\"onSubmit()\" novalidate>\r\n      <label>GROUP NAME</label>\r\n      <input type=\"text\" class=\"form-control\" name=\"group_name\" [(ngModel)]=\"newGroup.group_name\" placeholder=\"MY GROUP NAME\" /><br />\r\n      <label>GROUP MEMBERS</label>\r\n      <div>\r\n        <table class=\"table\" *ngIf='friends && friends.length'>\r\n          <thead>\r\n            <tr>\r\n              <th>People</th>\r\n              <th></th>\r\n              <th></th>\r\n            </tr>\r\n          </thead>\r\n          <tbody *ngFor=\"let friend of friends\">\r\n            <tr>\r\n              <td>\r\n                {{ friend.user_name }}\r\n              </td>\r\n              <td>\r\n                <button type=\"button\" class=\"btn btn-success\" (click)=\"addclick(friend)\">Add</button>\r\n              </td>\r\n              <td><button type=\"button\" class=\"btn btn-danger\" (click)=\"removeclick(friend)\">Remove</button></td>\r\n            </tr>\r\n          </tbody>\r\n        </table>\r\n        <!--<label style=\"font-weight:normal\">\r\n        {{ friend.user_name }}\r\n      </label>\r\n      <button type=\"button\" class=\"btn btn-danger\">Add</button>-->\r\n      </div>\r\n      <button type=\"submit\" class=\"btn btn-warning\">Save</button>\r\n    </form>\r\n  </div>\r\n  <div class=\"col-lg-6\">\r\n    <div class=\"container1\">\r\n      <div class=\"container2\">\r\n        <div style=\"position:relative;left:10px;top:15px\">\r\n          <label>Members:</label>\r\n        </div>\r\n        <div style=\"position:relative;left:10px;top:15px\">\r\n          <div>\r\n            <div *ngFor=\"let member of groupmember\">{{member}}</div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
+module.exports = "<div class=\"container\" style=\"width:auto\">\r\n  <h3>START A NEW GROUP</h3>\r\n  <br />\r\n  <div class=\"col-lg-6\">\r\n    <form class=\"form\" (ngSubmit)=\"onSubmit()\" novalidate>\r\n      <label>GROUP NAME</label>\r\n      <input type=\"text\" class=\"form-control\" name=\"group_name\" [(ngModel)]=\"newGroup.group_name\" placeholder=\"MY GROUP NAME\" /><br />\r\n      <label>GROUP MEMBERS</label>\r\n      <div>\r\n        <table class=\"table\" *ngIf='friends && friends.length'>\r\n          <thead>\r\n            <tr>\r\n              <th>People</th>\r\n              <th></th>\r\n              <th></th>\r\n            </tr>\r\n          </thead>\r\n          <tbody *ngFor=\"let friend of friends\">\r\n            <tr>\r\n              <td>\r\n                {{ friend.user_name }}\r\n              </td>\r\n              <td>\r\n                <button type=\"button\" id=\"{{friend.userid}}\" class=\"btn btn-success\" (click)=\"addclick(friend)\">Add</button>\r\n              </td>\r\n              <td><button type=\"button\" id=\"{{friend.userid}}\" class=\"btn btn-danger\" (click)=\"removeclick(friend)\">Remove</button></td>\r\n            </tr>\r\n          </tbody>\r\n        </table>\r\n        <!--<label style=\"font-weight:normal\">\r\n        {{ friend.user_name }}\r\n      </label>\r\n      <button type=\"button\" class=\"btn btn-danger\">Add</button>-->\r\n      </div>\r\n      <button type=\"submit\" class=\"btn btn-warning\">Save</button>\r\n    </form>\r\n  </div>\r\n  <div class=\"col-lg-6\">\r\n    <div class=\"container1\">\r\n      <div class=\"container2\">\r\n        <div style=\"position:relative;left:10px;top:15px\">\r\n          <label>Members:</label>\r\n        </div>\r\n        <div style=\"position:relative;left:10px;top:15px\">\r\n          <div>\r\n            <div *ngFor=\"let member of groupmember\">{{member}}</div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
 
 /***/ }),
 
@@ -686,6 +770,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_UserService__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Services/UserService */ "./src/app/Services/UserService.ts");
 /* harmony import */ var _Models_Model__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Models/Model */ "./src/app/Models/Model.ts");
 /* harmony import */ var _Services_GroupService__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Services/GroupService */ "./src/app/Services/GroupService.ts");
+/* harmony import */ var _Services_FriendService__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Services/FriendService */ "./src/app/Services/FriendService.ts");
+/* harmony import */ var _Services_HubService__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../Services/HubService */ "./src/app/Services/HubService.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -700,10 +786,14 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
+
 var CreateGroupComponent = /** @class */ (function () {
-    function CreateGroupComponent(route, router, user_service, group_service) {
+    function CreateGroupComponent(route, router, friend_service, service, user_service, group_service) {
         this.route = route;
         this.router = router;
+        this.friend_service = friend_service;
+        this.service = service;
         this.user_service = user_service;
         this.group_service = group_service;
         this.newGroup = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["CreateGroupResponse"]();
@@ -754,6 +844,14 @@ var CreateGroupComponent = /** @class */ (function () {
         }
         console.log(this.groupmemberid);
     };
+    //addFriends() {
+    //  for (var i = 0; i < this.groupmemberid.length; i++) {
+    //    for (var j = i + 1; j < this.groupmemberid.length; j++) {
+    //      this.friend_service.addFriend(this.groupmemberid[i].userid, this.groupmemberid[j].userid).
+    //        subscribe(data => console.log(data));
+    //    }
+    //  }
+    //}
     CreateGroupComponent.prototype.onSubmit = function () {
         this.newGroup.group_created_by = this.pmid;
         this.newGroup.groupMembers = this.groupmemberid;
@@ -761,6 +859,8 @@ var CreateGroupComponent = /** @class */ (function () {
         console.log(this.newGroup);
         this.group_service.CreateGroup(this.newGroup)
             .subscribe(function (data) { return console.log(data); });
+        // this.addFriends();
+        this.service.update();
         this.router.navigate(['/Board', this.pmid]);
     };
     CreateGroupComponent = __decorate([
@@ -769,7 +869,8 @@ var CreateGroupComponent = /** @class */ (function () {
             template: __webpack_require__(/*! ./create-group.component.html */ "./src/app/create-group/create-group.component.html"),
             styles: [__webpack_require__(/*! ./create-group.component.css */ "./src/app/create-group/create-group.component.css")]
         }),
-        __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_1__["ActivatedRoute"], _angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"], _Services_UserService__WEBPACK_IMPORTED_MODULE_2__["UserService"], _Services_GroupService__WEBPACK_IMPORTED_MODULE_4__["GroupService"]])
+        __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_1__["ActivatedRoute"], _angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"],
+            _Services_FriendService__WEBPACK_IMPORTED_MODULE_5__["FriendService"], _Services_HubService__WEBPACK_IMPORTED_MODULE_6__["HubConnectionService"], _Services_UserService__WEBPACK_IMPORTED_MODULE_2__["UserService"], _Services_GroupService__WEBPACK_IMPORTED_MODULE_4__["GroupService"]])
     ], CreateGroupComponent);
     return CreateGroupComponent;
 }());
@@ -785,7 +886,7 @@ var CreateGroupComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ".row{\r\n  height:500px;\r\n}\r\ndiv.navbar{\r\n  background-color:lightgray;\r\n  color:grey;\r\n  height:75px;\r\n}\r\ndiv.navbar1{\r\n  background-color:lightgray;\r\n  color:white;\r\n  height:50px;\r\n  position:relative;\r\n}\r\nlabel.nav-link{\r\n  border-color:black;\r\n  background-color:whitesmoke;\r\n  color:grey\r\n}\r\n.modal{\r\n  position:fixed;\r\n  right:100px;\r\n}\r\n.payer.modal.fade:not(.in) .modal-dialog{\r\n    -webkit-transform: translate3d(-25%, 0, 0);\r\n    transform: translate3d(-25%, 0, 0);\r\n}\r\n.payer{\r\n  position:fixed;\r\n  left:700px;\r\n}\r\n.modal-content{\r\n  width:300px;\r\n}\r\n.design{\r\n  align-content:center;\r\n}\r\n.myscroll.modal-body {\r\n  min-height:initial;\r\n  max-height:300px;\r\n  overflow-y:scroll;\r\n}\r\n.modal-header{\r\n  background-color:grey;\r\n  color:white;\r\n}\r\n\r\n"
+module.exports = ".row{\r\n  height:500px;\r\n}\r\ndiv.navbar{\r\n  background-color:lightgray;\r\n  color:grey;\r\n  height:75px;\r\n}\r\ndiv.navbar1{\r\n  background-color:lightgray;\r\n  color:white;\r\n  height:50px;\r\n  position:relative;\r\n}\r\nlabel.nav-link{\r\n  border-color:black;\r\n  background-color:whitesmoke;\r\n  color:grey\r\n}\r\n.detail{\r\n  background-color:lightgray;\r\n  height:50px;\r\n}\r\n.modal{\r\n  position:fixed;\r\n  right:100px;\r\n}\r\n.payer.modal.fade:not(.in) .modal-dialog{\r\n    -webkit-transform: translate3d(-25%, 0, 0);\r\n    transform: translate3d(-25%, 0, 0);\r\n}\r\n.payer{\r\n  position:fixed;\r\n  left:700px;\r\n}\r\n.payer1{\r\n  position:fixed;\r\n  left:200px;\r\n}\r\n.modal-content{\r\n  width:300px;\r\n}\r\n.design1{\r\n    align-content:center;\r\n}\r\n.design{\r\n  top:2px;\r\n  vertical-align:middle;\r\n  line-height:22px;\r\n  text-align:center;\r\n}\r\n.myscroll.modal-body {\r\n  min-height:initial;\r\n  max-height:300px;\r\n  overflow-y:scroll;\r\n}\r\n.modal-header{\r\n  background-color:grey;\r\n  color:white;\r\n}\r\n\r\n"
 
 /***/ }),
 
@@ -796,7 +897,7 @@ module.exports = ".row{\r\n  height:500px;\r\n}\r\ndiv.navbar{\r\n  background-c
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\r\n  <div class=\"col-lg-8 border-right border-dark\">\r\n    <div class=\"navbar navbar-expand-sm\">\r\n      <h3>Dashboard</h3>\r\n      <button type=\"button\" class=\"btn btn-success btn-lg\" style=\"position:absolute;left:500px\" data-toggle=\"modal\" data-target=\"#AddBill\">Add Bill</button>\r\n\r\n      <div class=\"modal fade\" id=\"AddBill\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Add Bill</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n\r\n              <div data-toggle=\"modal\" data-target=\"#BillfriendListModal\">\r\n                <label>\r\n                  Share with:\r\n                </label>\r\n              </div>\r\n\r\n              <div>\r\n\r\n                <label style=\"font-weight:normal;background-color:whitesmoke\"\r\n                       *ngFor=\"let member of billShareWith\">\r\n                  {{ member.name }}\r\n                  <span class=\"glyphicon glyphicon-remove\" (click)=\"removeMember(member.id)\"></span>\r\n                </label>\r\n\r\n              </div>\r\n\r\n              <form class=\"form\" novalidate>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-list-alt\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" [(ngModel)]=\"addBill.description\" name=\"description\" placeholder=\"Description\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" [(ngModel)]=\"addBill.total_amount\" name=\"amount\" placeholder=\"00.00\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-calendar\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" [(ngModel)]=\"addBill.bill_date\" name=\"date\" placeholder=\"MM-DD-YY\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div>\r\n                  Paid By\r\n                  <button type=\"button\" class=\"btn\" style=\"background-color:lightgray;border-radius:10px\"\r\n                          data-toggle=\"modal\" data-target=\"#BillPayer\">\r\n                    {{ paidby }}\r\n                  </button>\r\n                </div>\r\n                <div>\r\n                  <button type=\"button\" (click)=\"AddBillData()\" class=\"btn btn-success\" data-dismiss=\"modal\">Add</button>\r\n                </div>\r\n              </form>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"BillfriendListModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!--Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Select Friends</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <label class=\"nav-link\" style=\"font-weight:normal\"\r\n                     (click)=\"AddBillMember(friend.userid,friend.user_name)\" *ngFor=\"let friend of friends\">\r\n                {{friend.user_name}}\r\n              </label>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"BillPayer\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Payer</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body myscroll\">\r\n              <div class=\"payerlist\">\r\n               \r\n                <label class=\"nav-link\" style=\"font-weight:normal\"\r\n                      (click)=\"addSinglePayer(member.id)\" *ngFor=\"let member of billShareWith\">\r\n                  {{ member.name }}\r\n                </label>\r\n                <label class=\"nav-link\" (click)=\"showpayer()\">\r\n                  Multiple Payers\r\n                </label>\r\n                <div *ngIf=\"showPayer\">\r\n                  <label class=\"nav-link\" style=\"font-weight:normal\" *ngFor=\"let member of billShareWith\">\r\n                    {{ member.name }}\r\n                    <div class=\"input-group\">\r\n                      <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                      <input type=\"text\" #amt class=\"form-control\" placeholder=\"0.00\" />\r\n                    </div>\r\n                    <a (click)=\"addpayer(member.id,amt.value)\">Add</a>\r\n                  </label>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n\r\n      <button type=\"button\" class=\"btn btn-danger btn-lg\" style=\"position:absolute;left:600px\"\r\n              data-toggle=\"modal\" data-target=\"#FriendSettleModal\">\r\n        Settle Up\r\n      </button>\r\n\r\n\r\n      <div class=\"modal fade\" id=\"FriendSettleModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!--Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Settle Up</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <div *ngIf=\"showInfo\">\r\n                <div>\r\n                  Choose a payment method\r\n                </div><br />\r\n                <div>\r\n                  <button class=\"btn btn-success\" style=\"width:250px\" (click)=\"showsett()\">Record a cash Payment</button>\r\n                </div><br />\r\n                <div>\r\n                  <button class=\"btn btn-danger\" style=\"width:250px\">Pay via Paypal</button>\r\n                </div>\r\n              </div>\r\n              <div class=\"design\" *ngIf=\"showSettle\">\r\n                <div>\r\n                  <span class=\"glyphicon glyphicon-user\" style=\"font-size:40px;position:relative;left:40px\"></span>\r\n                  <span class=\"glyphicon glyphicon-arrow-right\" style=\"font-size:30px;position:relative;left:60px\"></span>\r\n                  <span class=\"glyphicon glyphicon-user\" style=\"font-size:40px;position:relative;left:80px\"></span>\r\n                </div>\r\n                <div>\r\n                  <label style=\"position:relative;left:40px\">{{ user.user_name}}</label>\r\n                  <label style=\"position:relative;left:60px\">paid</label>\r\n                  <label style=\"position:relative;left:80px\"\r\n                         data-toggle=\"modal\" data-target=\"#friendListModal\">{{ Pay_to }}</label>\r\n                </div>\r\n                <br />\r\n                <div class=\"form-group\" style=\"position:relative;left:50px\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" [(ngModel)]=\"settleAmt\" style=\"width:100px\" placeholder=\"00.00\" />\r\n                  </div>\r\n                </div>\r\n                <div>\r\n                  <button class=\"btn check\" style=\"position:relative;border-radius:10px;left:40px\"\r\n                          data-toggle=\"modal\" data-target=\"#groupListModal\" (click)=\"showGroups()\">\r\n                    {{ setAmong }}\r\n                  </button>\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"modal-footer\">\r\n              <button class=\"btn btn-success\" (click)=\"addSettlement()\">Save</button>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n\r\n\r\n      <div class=\"modal fade payer\" id=\"groupListModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!--Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Groups</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <label class=\"nav-link\" style=\"font-weight:normal\" (click)=\"selectNonGroup()\">\r\n                Non Group\r\n              </label>\r\n              <label class=\"nav-link\" style=\"font-weight:normal\" (click)=\"selectGroup(group.groupid,group.group_name)\" *ngFor=\"let group of groups\">\r\n                {{group.group_name}}\r\n              </label>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"friendListModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!--Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Friends</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <label class=\"nav-link\" style=\"font-weight:normal\"\r\n                     (click)=\"selectFriend(friend.userid,friend.user_name)\" *ngFor=\"let friend of friends\">\r\n                {{friend.user_name}}\r\n              </label>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n\r\n\r\n\r\n    </div>\r\n\r\n\r\n   \r\n\r\n\r\n  </div>\r\n  <div class=\"col-lg-4\">\r\n    fafadas\r\n  </div>\r\n</div>\r\n"
+module.exports = "<div class=\"row\">\r\n  <div class=\"col-lg-8 border-right border-dark\">\r\n    <div class=\"navbar navbar-expand-sm\">\r\n      <h3>Dashboard</h3>\r\n      <button type=\"button\" class=\"btn btn-success btn-lg\" style=\"position:absolute;left:500px\" data-toggle=\"modal\" data-target=\"#AddBill\">Add Bill</button>\r\n\r\n      <div class=\"modal fade\" id=\"AddBill\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Add Bill</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n\r\n              <div data-toggle=\"modal\" data-target=\"#BillfriendListModal\">\r\n                <label>\r\n                  Share with:\r\n                </label>\r\n              </div>\r\n              <div>\r\n\r\n                <label style=\"font-weight:normal;background-color:whitesmoke\"\r\n                       *ngFor=\"let member of billShareWith\">\r\n                  {{ member.name }}\r\n                  <span class=\"glyphicon glyphicon-remove\" (click)=\"removeMember(member.id)\"></span>\r\n                </label>\r\n\r\n              </div>\r\n\r\n              <form class=\"form\" novalidate>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-list-alt\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" [(ngModel)]=\"addBill.description\" name=\"description\" placeholder=\"Description\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" [(ngModel)]=\"addBill.total_amount\" name=\"amount\" placeholder=\"00.00\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-calendar\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" [(ngModel)]=\"addBill.bill_date\" name=\"date\" placeholder=\"MM-DD-YY\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div>\r\n                  Paid By\r\n                  <button type=\"button\" class=\"btn\" style=\"background-color:lightgray;border-radius:10px\"\r\n                          data-toggle=\"modal\" data-target=\"#BillPayer\">\r\n                    {{ paidby }}\r\n                  </button>\r\n                </div>\r\n                <div>\r\n                  <button type=\"button\" (click)=\"AddBillData()\" class=\"btn btn-success\" data-dismiss=\"modal\">Add</button>\r\n                </div>\r\n              </form>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n        \r\n\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"BillfriendListModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!--Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Select Friends</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <label class=\"nav-link\" style=\"font-weight:normal\"\r\n                     (click)=\"AddBillMember(friend.userid,friend.user_name)\" *ngFor=\"let friend of friends\">\r\n                {{friend.user_name}}\r\n              </label>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"BillPayer\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Payer</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body myscroll\">\r\n              <div class=\"payerlist\">\r\n\r\n                <label class=\"nav-link\" style=\"font-weight:normal\"\r\n                       (click)=\"addSinglePayer(member.id)\" *ngFor=\"let member of billShareWith\">\r\n                  {{ member.name }}\r\n                </label>\r\n                <label class=\"nav-link\" (click)=\"showpayer()\">\r\n                  Multiple Payers\r\n                </label>\r\n                <div *ngIf=\"showPayer\">\r\n                  <label class=\"nav-link\" style=\"font-weight:normal\" *ngFor=\"let member of billShareWith\">\r\n                    {{ member.name }}\r\n                    <div class=\"input-group\">\r\n                      <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                      <input type=\"text\" #amt class=\"form-control\" placeholder=\"0.00\" />\r\n                    </div>\r\n                    <a (click)=\"addpayer(member.id,amt.value)\">Add</a>\r\n                  </label>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n\r\n      <button type=\"button\" class=\"btn btn-danger btn-lg\" style=\"position:absolute;left:600px\"\r\n              data-toggle=\"modal\" data-target=\"#FriendSettleModal\">\r\n        Settle Up\r\n      </button>\r\n\r\n\r\n      <div class=\"modal fade\" id=\"FriendSettleModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!--Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Settle Up</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <div *ngIf=\"showInfo\">\r\n                <div>\r\n                  Choose a payment method\r\n                </div><br />\r\n                <div>\r\n                  <button class=\"btn btn-success\" style=\"width:250px\" (click)=\"showsett()\">Record a cash Payment</button>\r\n                </div><br />\r\n                <div>\r\n                  <button class=\"btn btn-danger\" style=\"width:250px\">Pay via Paypal</button>\r\n                </div>\r\n              </div>\r\n              <div class=\"design1\" *ngIf=\"showSettle\">\r\n                <div>\r\n                  <span class=\"glyphicon glyphicon-user\" style=\"font-size:40px;position:relative;left:40px\"></span>\r\n                  <span class=\"glyphicon glyphicon-arrow-right\" style=\"font-size:30px;position:relative;left:60px\"></span>\r\n                  <span class=\"glyphicon glyphicon-user\" style=\"font-size:40px;position:relative;left:80px\"></span>\r\n                </div>\r\n                <div>\r\n                  <label style=\"position:relative;left:40px\">{{ user.user_name}}</label>\r\n                  <label style=\"position:relative;left:60px\">paid</label>\r\n                  <label style=\"position:relative;left:80px\"\r\n                         data-toggle=\"modal\" data-target=\"#friendListModal\">{{ Pay_to }}</label>\r\n                </div>\r\n                <br />\r\n                <div class=\"form-group\" style=\"position:relative;left:50px\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" [(ngModel)]=\"settleAmt\" style=\"width:100px\" placeholder=\"00.00\" />\r\n                  </div>\r\n                </div>\r\n                <div>\r\n                  <button class=\"btn check\" style=\"position:relative;border-radius:10px;left:40px\"\r\n                          data-toggle=\"modal\" data-target=\"#groupListModal\" (click)=\"showGroups()\">\r\n                    {{ setAmong }}\r\n                  </button>\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"modal-footer\">\r\n              <button class=\"btn btn-success\" data-dismiss=\"modal\" (click)=\"addSettlement()\">Save</button>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n\r\n\r\n      <div class=\"modal fade payer\" id=\"groupListModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!--Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Groups</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <label class=\"nav-link\" style=\"font-weight:normal\" (click)=\"selectNonGroup()\">\r\n                Non Group\r\n              </label>\r\n              <label class=\"nav-link\" style=\"font-weight:normal\" (click)=\"selectGroup(group.groupid,group.group_name)\" *ngFor=\"let group of groups\">\r\n                {{group.group_name}}\r\n              </label>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"friendListModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!--Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Friends</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <label class=\"nav-link\" style=\"font-weight:normal\"\r\n                     (click)=\"selectFriend(friend.userid,friend.user_name)\" *ngFor=\"let friend of friends\">\r\n                {{friend.user_name}}\r\n              </label>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n\r\n\r\n\r\n    </div>\r\n\r\n    <div class=\"detail\">\r\n      <div class=\"col-lg-4 design border-right\">\r\n        total balance\r\n        <div *ngIf=\"total>0\" style=\"color:green\">\r\n          {{total}}\r\n        </div>\r\n        <div *ngIf=\"total<0\" style=\"color:red\">\r\n          {{total}}\r\n        </div>\r\n      </div>\r\n      <div class=\"col-lg-4 design border-right\">\r\n        you owe\r\n        <div style=\"color:red\">\r\n          {{owe}}\r\n        </div>\r\n      </div>\r\n      <div class=\"col-lg-4 design\">\r\n        you are owed\r\n        <div style=\"color:green\">\r\n          {{owed}}\r\n        </div>\r\n      </div>\r\n    </div>\r\n    <br />\r\n    <div>\r\n      <div class=\"col-lg-6 border-right\">\r\n        <h4 class=\"border-bottom\" style=\"font-weight:bold;color:gray\">\r\n        YOU OWE</h4>\r\n        <div *ngFor=\"let info of details\">\r\n          <div *ngIf=\"info.amt<0\">\r\n              <h4>\r\n                {{info.member.name}}\r\n              </h4>\r\n              you owe  {{ 0-(info.amt)}}\r\n              <ul *ngFor=\"let detail of owedetails\" style=\"color:red\">\r\n                <li *ngIf=\"detail.id==info.member.id\">{{detail.detail}}</li>\r\n              </ul>\r\n              <ul *ngFor=\"let detail of oweddetails\" style=\"color:green\">\r\n                <li *ngIf=\"detail.id==info.member.id\">{{detail.detail}}</li>\r\n              </ul>\r\n            </div>\r\n          </div>\r\n      </div>\r\n      <div class=\"col-lg-6 border-left\" style=\"position:relative;right:1px; height:auto\">\r\n        <h4 class=\"border-bottom\" style=\"font-weight:bold;text-align:right;color:gray\">\r\n          YOU ARE OWED\r\n        </h4>\r\n          <div *ngFor=\"let info of details\">\r\n            <div *ngIf=\"info.amt>0\">\r\n              <h4>\r\n                {{info.member.name}}\r\n              </h4>\r\n              owes you {{ info.amt}}\r\n              <ul *ngFor=\"let detail of owedetails\" style=\"color:red\">\r\n                <li *ngIf=\"detail.id==info.member.id\">{{detail.detail}}</li>\r\n              </ul>\r\n              <ul *ngFor=\"let detail of oweddetails\" style=\"color:green\">\r\n                <li *ngIf=\"detail.id==info.member.id\">{{detail.detail}}</li>\r\n              </ul>\r\n            </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\r\n\r\n    </div>\r\n    <div class=\"col-lg-4\">\r\n      Advertisements\r\n    </div>\r\n  </div>\r\n"
 
 /***/ }),
 
@@ -841,6 +942,15 @@ var DashboardComponent = /** @class */ (function () {
         this.billShareWith = new Array();
         this.billsharewith = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["Detail"]();
         this.showPayer = false;
+        this.owe = 0;
+        this.owed = 0;
+        this.total = 0;
+        this.owedetails = new Array();
+        this.oweddetails = new Array();
+        this.details = new Array();
+        this.info = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["GroupBalance"]();
+        this.member = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["Detail"]();
+        this.detail = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["GroupBalanceDetail"]();
         this.addBill = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["BillResponse"]();
         this.payer = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["PayerResponse"]();
         this.payers = new Array();
@@ -868,7 +978,71 @@ var DashboardComponent = /** @class */ (function () {
         //this.id = this.route.snapshot.params['id'];
         this.user_service.getFriends(this.id).subscribe(function (data) {
             _this.friends = data;
-            //  console.log(data),
+            for (var i = 0; i < _this.friends.length; i++) {
+                _this.info = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["GroupBalance"]();
+                _this.member = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["Detail"]();
+                _this.member.id = _this.friends[i].userid;
+                _this.member.name = _this.friends[i].user_name;
+                _this.info.member = _this.member;
+                //this.info.member.name = this.friends[i].user_name;
+                _this.info.status = "false";
+                _this.info.amt = 0;
+                _this.details.push(_this.info);
+            }
+            _this.bill_service.getUserSettlements(_this.id)
+                .subscribe(function (data) {
+                _this.allUserSettlement = data,
+                    console.log(_this.allUserSettlement);
+                for (var i = 0; i < _this.allUserSettlement.length; i++) {
+                    if (_this.allUserSettlement[i].amount != 0) {
+                        if (_this.id == _this.allUserSettlement[i].payer.id) {
+                            _this.detail = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["GroupBalanceDetail"]();
+                            _this.detail.detail = "You owe " + _this.allUserSettlement[i].payee.name + " " + _this.allUserSettlement[i].amount;
+                            if (_this.allUserSettlement[i].group == null) {
+                                _this.detail.detail = _this.detail.detail + " for " + "'" + "Non Group Expense" + "'";
+                            }
+                            else {
+                                _this.detail.detail = _this.detail.detail + " for " + "'" + _this.allUserSettlement[i].group.name + "'";
+                            }
+                            _this.detail.id = _this.allUserSettlement[i].payee.id;
+                            _this.owedetails.push(_this.detail);
+                            var index = _this.details.findIndex(function (c) { return c.member.id == _this.detail.id; });
+                            _this.details[index].status = "owe";
+                            _this.details[index].amt = _this.details[index].amt - _this.allUserSettlement[i].amount;
+                            //this.owe = this.owe - this.allUserSettlement[i].amount;
+                        }
+                        if (_this.id == _this.allUserSettlement[i].payee.id) {
+                            _this.detail = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["GroupBalanceDetail"]();
+                            _this.detail.detail = _this.allUserSettlement[i].payer.name + " owes you " + _this.allUserSettlement[i].amount;
+                            if (_this.allUserSettlement[i].group == null) {
+                                _this.detail.detail = _this.detail.detail + " for " + "'" + "Non Group Expense" + "'";
+                            }
+                            else {
+                                _this.detail.detail = _this.detail.detail + " for " + "'" + _this.allUserSettlement[i].group.name + "'";
+                            }
+                            _this.detail.id = _this.allUserSettlement[i].payer.id;
+                            _this.oweddetails.push(_this.detail);
+                            var index = _this.details.findIndex(function (c) { return c.member.id == _this.detail.id; });
+                            _this.details[index].status = "owes";
+                            _this.details[index].amt = _this.details[index].amt + _this.allUserSettlement[i].amount;
+                            //this.owed = this.owed + this.allUserSettlement[i].amount;
+                        }
+                    }
+                }
+                for (var i = 0; i < _this.details.length; i++) {
+                    if (_this.details[i].amt > 0) {
+                        _this.owed = _this.owed + _this.details[i].amt;
+                    }
+                    else if (_this.details[i].amt < 0) {
+                        _this.owe = _this.owe + _this.details[i].amt;
+                    }
+                }
+                _this.total = _this.owed - (0 - _this.owe);
+                _this.owe = 0 - (_this.owe);
+            });
+            console.log(_this.details);
+            console.log(_this.oweddetails);
+            console.log(_this.owedetails);
             // console.log(this.friends)
         });
         this.user_service.getUserData(this.id)
@@ -924,6 +1098,7 @@ var DashboardComponent = /** @class */ (function () {
         this.my_date = new Date().toLocaleString();
         this.settleUp.paid_on = this.my_date;
         this.bill_service.settleUp(this.settleUp).subscribe(function (data) { return console.log(data); });
+        this.settleUp = null;
     };
     DashboardComponent.prototype.nonGroup = function () {
         var _this = this;
@@ -1017,7 +1192,8 @@ var DashboardComponent = /** @class */ (function () {
         if (this.payers.length == 0) {
             this.payers.push(this.payer);
         }
-        var div = this.addBill.total_amount / this.billShareWith.length;
+        var div = Number.parseFloat((this.addBill.total_amount / this.billShareWith.length).toFixed(2));
+        //div = Math.round(div);
         for (var i = 0; i < this.billShareWith.length; i++) {
             this.shareMember = new _Models_Model__WEBPACK_IMPORTED_MODULE_1__["SharedWithResponse"]();
             this.shareMember.owes_amount = div;
@@ -1159,6 +1335,86 @@ var DashboardComponent = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./src/app/expense/expense.component.css":
+/*!***********************************************!*\
+  !*** ./src/app/expense/expense.component.css ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "div.navbar{\r\n  background-color:lightgray;\r\n  color:grey;\r\n  height:75px;\r\n}\r\n.design1{\r\n  vertical-align:middle;\r\n  text-align:center;\r\n}\r\ndiv.billNav{\r\n  background-color:whitesmoke;\r\n}\r\n\r\n"
+
+/***/ }),
+
+/***/ "./src/app/expense/expense.component.html":
+/*!************************************************!*\
+  !*** ./src/app/expense/expense.component.html ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<div class=\"row\">\r\n  <div class=\"col-lg-8\">\r\n    <div class=\"navbar navbar-expand-sm\">\r\n      <h3>All Expense</h3>\r\n    </div>\r\n    <div class=\"billNav\">\r\n      <!--<div class=\"panel-group\">-->\r\n      <div class=\"panel panel-default\">\r\n        <div class=\"panel-heading\">\r\n          <!--<div class=\"date\"> \"Aug\"\r\n        <div class=\"number\">31</div>\r\n        </div>-->\r\n          <div class=\"row\">\r\n            <div class=\"col-lg-11\">\r\n              <label class=\"panel-title\" style=\"color:gray\">\r\n                <a data-toggle=\"collapse\" href=\"#set\">Settlements</a>\r\n              </label>\r\n            </div>\r\n\r\n          </div>\r\n\r\n\r\n        </div>\r\n        <div id=\"set\" class=\"panel-collapse collapse\">\r\n          <div class=\"panel-body\">\r\n\r\n            <div class=\"billNav\" *ngFor=\"let settle of transactions\">\r\n              <!--<div class=\"panel-group\">-->\r\n              <div class=\"panel panel-default\">\r\n                <div class=\"panel-heading\">\r\n                  <!--<div class=\"date\"> \"Aug\"\r\n                <div class=\"number\">31</div>\r\n                </div>-->\r\n                  <div class=\"row\">\r\n                    <div class=\"col-lg-1 design1\">\r\n                      {{ settle.paid_on | date:'MMM'}}\r\n                      <div class=\"design\">\r\n                        {{ settle.paid_on | date:'dd'}}\r\n                      </div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                      <label style=\"font-weight:normal\" class=\"panel-title\" *ngIf=\"settle.groupId==null\">\r\n                        {{settle.payerId.name }} paid {{settle.payeeId.name}} &#8377;{{settle.paid_amount}}\r\n                      </label>\r\n                      <label class=\"panel-title\" style=\"font-weight:normal\" *ngIf=\"settle.groupId!=null\">\r\n                        {{settle.payerId.name }} paid {{settle.payeeId.name}} &#8377;{{settle.paid_amount}} in \"{{ settle.groupId.name}}\"\r\n                      </label>\r\n                    </div>\r\n\r\n                  </div>\r\n\r\n\r\n                </div>\r\n                <!--<div id=\"\" class=\"panel-collapse collapse\">\r\n                <div class=\"panel-body border-bottom\">\r\n                  <br />\r\n                 fjklf\r\n                </div>\r\n\r\n              </div>-->\r\n                <!--</div>-->\r\n              </div>\r\n            </div>\r\n\r\n\r\n\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n\r\n    <div class=\"billNav\" *ngFor=\"let bill of bills\">\r\n      <!--<div class=\"panel-group\">-->\r\n      <div class=\"panel panel-default\">\r\n        <div class=\"panel-heading\">\r\n          <!--<div class=\"date\"> \"Aug\"\r\n        <div class=\"number\">31</div>\r\n        </div>-->\r\n          <div class=\"row\">\r\n            <div class=\"col-lg-1 design\">\r\n              {{ bill.bill_created_at | date:'MMM'}}\r\n              <div class=\"design\">\r\n                {{ bill.bill_created_at | date:'dd'}}\r\n              </div>\r\n            </div>\r\n            <div class=\"col-lg-7\">\r\n              <label class=\"panel-title\" style=\"color:grey\">\r\n                <a data-toggle=\"collapse\" href=\"#{{bill.billid}}\">{{bill.description}}</a>\r\n              </label>\r\n            </div>\r\n            <!--<div class=\"col-lg-4\">\r\n              <div class=\"col-lg-6 design\">\r\n                Paid by\r\n                <div class=\"design\">\r\n                  0000\r\n                </div>\r\n              </div>\r\n              <div class=\"col-lg-6 design\">\r\n                lent\r\n                <div class=\"design\">\r\n                  0000\r\n                </div>\r\n              </div>\r\n            </div>-->\r\n          </div>\r\n\r\n\r\n        </div>\r\n        <div id=\"{{bill.billid}}\" class=\"panel-collapse collapse\">\r\n          <div class=\"panel-body border-bottom\">\r\n            {{bill.description}}\r\n            <br />\r\n            <h4>  &#8377;{{bill.total_amount}}</h4>\r\n            Added by {{ bill.bill_created_by.name}}\r\n            on {{bill.bill_created_at | date:'MMMM'}} {{bill.bill_created_at | date:'dd'}},{{bill.bill_created_at | date:'yyyy'}}\r\n          </div>\r\n          <div class=\"panel-body\">\r\n            <div *ngFor=\"let member of bill.sharedwiths\">\r\n              {{member.name}}\r\n              <label style=\"font-weight:normal\" *ngFor=\"let memberP of bill.payers\">\r\n                <label style=\"font-weight:normal\" *ngIf=\"member.id==memberP.id\">\r\n                  paid &#8377;{{ memberP.amount}} and &nbsp;\r\n                </label>\r\n              </label>\r\n              <label style=\"font-weight:normal\">\r\n                owes &#8377;{{member.amount}}\r\n              </label>\r\n            </div>\r\n          </div>\r\n        </div>\r\n        <!--</div>-->\r\n      </div>\r\n    </div>\r\n\r\n\r\n  </div>\r\n  </div>\r\n"
+
+/***/ }),
+
+/***/ "./src/app/expense/expense.component.ts":
+/*!**********************************************!*\
+  !*** ./src/app/expense/expense.component.ts ***!
+  \**********************************************/
+/*! exports provided: ExpenseComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ExpenseComponent", function() { return ExpenseComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
+/* harmony import */ var _Services_UserService__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Services/UserService */ "./src/app/Services/UserService.ts");
+/* harmony import */ var _Services_BillService__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Services/BillService */ "./src/app/Services/BillService.ts");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var ExpenseComponent = /** @class */ (function () {
+    function ExpenseComponent(route, user_service, bill_service) {
+        this.route = route;
+        this.user_service = user_service;
+        this.bill_service = bill_service;
+    }
+    ExpenseComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.route.parent.params.subscribe(function (params) {
+            _this.userid = params['id'];
+        });
+        this.bill_service.getUserExpenseTransaction(this.userid)
+            .subscribe(function (data) { return _this.transactions = data; });
+        this.bill_service.getUserBills(this.userid)
+            .subscribe(function (data) { return _this.bills = data; });
+    };
+    ExpenseComponent = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
+            selector: 'app-expense',
+            template: __webpack_require__(/*! ./expense.component.html */ "./src/app/expense/expense.component.html"),
+            styles: [__webpack_require__(/*! ./expense.component.css */ "./src/app/expense/expense.component.css")]
+        }),
+        __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_1__["ActivatedRoute"], _Services_UserService__WEBPACK_IMPORTED_MODULE_2__["UserService"], _Services_BillService__WEBPACK_IMPORTED_MODULE_3__["BillService"]])
+    ], ExpenseComponent);
+    return ExpenseComponent;
+}());
+
+
+
+/***/ }),
+
 /***/ "./src/app/friend-board/friend-board.component.css":
 /*!*********************************************************!*\
   !*** ./src/app/friend-board/friend-board.component.css ***!
@@ -1166,7 +1422,7 @@ var DashboardComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ".row{\r\n  height:500px;\r\n}\r\ndiv.navbar{\r\n  background-color:lightgray;\r\n  color:grey;\r\n  height:75px;\r\n}\r\ndiv.navbar1{\r\n  background-color:lightgray;\r\n  color:white;\r\n  height:50px;\r\n  position:relative;\r\n}\r\n.design{\r\n  align-content:center;\r\n}\r\nlabel.nav-link{\r\n  border-color:black;\r\n  background-color:whitesmoke;\r\n  color:grey\r\n}\r\ndiv.billNav{\r\n  background-color:whitesmoke;\r\n}\r\nlabel.billNav1.nav-link:hover{\r\n  background-color:lightgray;\r\n}\r\n.myscroll.modal-body {\r\n  min-height:initial;\r\n  max-height:300px;\r\n  overflow-y:scroll;\r\n}\r\n.modal{\r\n  position:fixed;\r\n  right:100px;\r\n}\r\n.payer.modal.fade:not(.in) .modal-dialog{\r\n    -webkit-transform: translate3d(-25%, 0, 0);\r\n    transform: translate3d(-25%, 0, 0);\r\n}\r\n.payer{\r\n  left:700px;\r\n}\r\n.modal-content{\r\n  width:300px;\r\n}\r\n.modal-header{\r\n  background-color:grey;\r\n  color:white;\r\n}\r\n"
+module.exports = ".full{\r\n  height:500px;\r\n}\r\ndiv.navbar{\r\n  background-color:lightgray;\r\n  color:grey;\r\n  height:75px;\r\n}\r\ndiv.navbar1{\r\n  background-color:lightgray;\r\n  color:white;\r\n  height:50px;\r\n  position:relative;\r\n}\r\n.design{\r\n  align-content:center;\r\n}\r\n.design1{\r\n  vertical-align:middle;\r\n  text-align:center;\r\n}\r\nlabel.nav-link{\r\n  border-color:black;\r\n  background-color:whitesmoke;\r\n  color:grey\r\n}\r\ndiv.billNav{\r\n  background-color:whitesmoke;\r\n}\r\nlabel.billNav1.nav-link:hover{\r\n  background-color:lightgray;\r\n}\r\n.myscroll.modal-body {\r\n  min-height:initial;\r\n  max-height:300px;\r\n  overflow-y:scroll;\r\n}\r\n.modal{\r\n  position:fixed;\r\n  right:100px;\r\n}\r\n.payer.modal.fade:not(.in) .modal-dialog{\r\n    -webkit-transform: translate3d(-25%, 0, 0);\r\n    transform: translate3d(-25%, 0, 0);\r\n}\r\n.payer{\r\n  left:700px;\r\n}\r\n.modal-content{\r\n  width:300px;\r\n}\r\n.modal-header{\r\n  background-color:grey;\r\n  color:white;\r\n}\r\n"
 
 /***/ }),
 
@@ -1177,7 +1433,7 @@ module.exports = ".row{\r\n  height:500px;\r\n}\r\ndiv.navbar{\r\n  background-c
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\r\n  <div class=\"col-lg-8 border-right border-dark\">\r\n    <div class=\"navbar navbar-expand-sm\">\r\n      <h3>{{ friend.user_name}}</h3>\r\n      <button type=\"button\" class=\"btn btn-success btn-lg\" style=\"position:absolute;left:500px\" data-toggle=\"modal\" data-target=\"#FriendBillModal\">Add Bill</button>\r\n\r\n      <div class=\"modal fade\" id=\"FriendBillModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Add Bill with {{ friend.user_name }}</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <form class=\"form\" novalidate>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-list-alt\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"description\" [(ngModel)]=\"addBill.description\" placeholder=\"Description\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"amount\" [(ngModel)]=\"addBill.total_amount\" placeholder=\"00.00\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-calendar\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"amount\" [(ngModel)]=\"addBill.bill_date\" placeholder=\"\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div>\r\n                  Paid By\r\n                  <a style=\"background-color:lightgray;border-radius:5px;font-weight:bold;min-height:10px\" data-toggle=\"modal\" data-target=\"#FriendBillPayer\">\r\n                    {{ paidby }}\r\n                  </a>\r\n                </div>\r\n                <div>\r\n                  <button type=\"button\" (click)=\"AddBillData()\" class=\"btn btn-success\" data-dismiss=\"modal\">Add</button>\r\n                </div>\r\n              </form>\r\n            </div>\r\n\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"FriendBillPayer\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Payer</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body myscroll\">\r\n              <div class=\"payerlist\">\r\n                <label class=\"nav-link\" style=\"font-weight:normal\" (click)=\"addSinglePayer(friend.userid)\">\r\n                  {{ friend.user_name }}\r\n                </label>\r\n                <label class=\"nav-link\" style=\"font-weight:normal\" (click)=\"addSinglePayer(user.userid)\">\r\n                  {{ user.user_name }}\r\n                </label>\r\n                <label class=\"nav-link\" (click)=\"showpayer()\">\r\n                  Multiple Payers\r\n                </label>\r\n                <div *ngIf=\"showPayer\">\r\n                  <label class=\"nav-link\" style=\"font-weight:normal\">\r\n                    {{ friend.user_name }}\r\n                    <div class=\"input-group\">\r\n                      <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                      <input type=\"text\" class=\"form-control\" [(ngModel)]=\"friendPay\" placeholder=\"0.00\" />\r\n                    </div>\r\n                  </label>\r\n                  <label class=\"nav-link\" style=\"font-weight:normal\">\r\n                    {{ user.user_name }}\r\n                    <div class=\"input-group\">\r\n                      <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                      <input type=\"text\" class=\"form-control\" [(ngModel)]=\"userPay\" placeholder=\"0.00\" />\r\n                    </div>\r\n                  </label>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n\r\n      <button type=\"button\" class=\"btn btn-danger btn-lg\" style=\"position:absolute;left:600px\">Settle Up</button>\r\n\r\n      \r\n\r\n\r\n    </div>\r\n\r\n      <div class=\"billNav\" *ngFor=\"let bill of bills\">\r\n        <!--<div class=\"panel-group\">-->\r\n        <div class=\"panel panel-default\">\r\n          <div class=\"panel-heading\">\r\n            <h4 class=\"panel-title\">\r\n              <!--<div class=\"date\"> \"Aug\"\r\n          <div class=\"number\">31</div>\r\n          </div>-->\r\n\r\n              <a data-toggle=\"collapse\" href=\"#{{bill.billid}}\">{{bill.description}}</a>\r\n            </h4>\r\n          </div>\r\n          <div id=\"{{bill.billid}}\" class=\"panel-collapse collapse\">\r\n            <div class=\"panel-body\">\r\n              {{bill.description}}\r\n              added by {{ bill.bill_created_by.name}}\r\n              on {{bill.bill_created_at}}\r\n            </div>\r\n            <div class=\"panel-footer\">{{bill}}</div>\r\n\r\n          </div>\r\n          <!--</div>-->\r\n        </div>\r\n      </div>\r\n\r\n    </div>\r\n  <div class=\"col-lg-4\">\r\n    <button type=\"button\" class=\"btn\" style=\"background-color:powderblue\" (click)=\"delete()\">\r\n      <span class=\"glyphicon glyphicon-trash\"></span>\r\n    </button>\r\n    <button type=\"button\" class=\"btn\" style=\"background-color:powderblue;position:relative;left:10px\">\r\n      <span class=\"glyphicon glyphicon-list-alt\"></span>\r\n    </button>\r\n    <br /><br />\r\n    <div>\r\n      <h4>\r\n        Balance\r\n      </h4>\r\n      <div>\r\n        <h5>\r\n          A owes B\r\n        </h5>\r\n        <h3>200</h3>\r\n      </div>\r\n    </div>\r\n    <div>\r\n      <h4>\r\n        Detail\r\n      </h4>\r\n    </div>\r\n  </div>\r\n  </div>\r\n"
+module.exports = "<div class=\"row full\">\r\n  <div class=\"col-lg-8 border-right border-dark\">\r\n    <div class=\"navbar navbar-expand-sm\">\r\n      <h3>{{ friend.user_name}}</h3>\r\n      <button type=\"button\" class=\"btn btn-success btn-lg\" style=\"position:absolute;left:600px\" data-toggle=\"modal\" data-target=\"#FriendBillModal\">Add Bill</button>\r\n\r\n      <div class=\"modal fade\" id=\"FriendBillModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Add Bill with {{ friend.user_name }}</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <form class=\"form\" novalidate>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-list-alt\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"description\" [(ngModel)]=\"addBill.description\" placeholder=\"Description\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon\" style=\"font-size:large\">&#8377;</i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"amount\" [(ngModel)]=\"addBill.total_amount\" placeholder=\"00.00\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-calendar\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"amount\" [(ngModel)]=\"addBill.bill_date\" placeholder=\"\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div>\r\n                  Paid By\r\n                  <a style=\"background-color:lightgray;border-radius:5px;font-weight:bold;min-height:10px\" data-toggle=\"modal\" data-target=\"#FriendBillPayer\">\r\n                    {{ paidby }}\r\n                  </a>\r\n                </div>\r\n                <div>\r\n                  <button type=\"button\" (click)=\"AddBillData()\" class=\"btn btn-success\" data-dismiss=\"modal\">Add</button>\r\n                </div>\r\n              </form>\r\n            </div>\r\n\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"FriendBillPayer\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Payer</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body myscroll\">\r\n              <div class=\"payerlist\">\r\n                <label class=\"nav-link\" style=\"font-weight:normal\" (click)=\"addSinglePayer(friend.userid)\">\r\n                  {{ friend.user_name }}\r\n                </label>\r\n                <label class=\"nav-link\" style=\"font-weight:normal\" (click)=\"addSinglePayer(user.userid)\">\r\n                  {{ user.user_name }}\r\n                </label>\r\n                <label class=\"nav-link\" (click)=\"showpayer()\">\r\n                  Multiple Payers\r\n                </label>\r\n                <div *ngIf=\"showPayer\">\r\n                  <label class=\"nav-link\" style=\"font-weight:normal\">\r\n                    {{ friend.user_name }}\r\n                    <div class=\"input-group\">\r\n                      <span class=\"input-group-addon\"><i class=\"glyphicon\" style=\"font-size:large\">&#8377;</i></span>\r\n                      <input type=\"text\" class=\"form-control\" [(ngModel)]=\"friendPay\" placeholder=\"0.00\" />\r\n                    </div>\r\n                  </label>\r\n                  <label class=\"nav-link\" style=\"font-weight:normal\">\r\n                    {{ user.user_name }}\r\n                    <div class=\"input-group\">\r\n                      <span class=\"input-group-addon\"><i class=\"glyphicon\" style=\"font-size:large\">&#8377;</i></span>\r\n                      <input type=\"text\" class=\"form-control\" [(ngModel)]=\"userPay\" placeholder=\"0.00\" />\r\n                    </div>\r\n                  </label>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n\r\n    </div>\r\n\r\n\r\n    <div class=\"billNav\">\r\n      <!--<div class=\"panel-group\">-->\r\n      <div class=\"panel panel-default\">\r\n        <div class=\"panel-heading\">\r\n          <!--<div class=\"date\"> \"Aug\"\r\n        <div class=\"number\">31</div>\r\n        </div>-->\r\n          <div class=\"row\">\r\n            <div class=\"col-lg-11\">\r\n              <label class=\"panel-title\">\r\n                <a data-toggle=\"collapse\" href=\"#set\"  style=\"color:grey\">Settlements</a>\r\n              </label>\r\n            </div>\r\n\r\n          </div>\r\n\r\n\r\n        </div>\r\n        <div id=\"set\" class=\"panel-collapse collapse\">\r\n          <div class=\"panel-body\">\r\n\r\n            <div class=\"billNav\" *ngFor=\"let settle of transactions\">\r\n              <!--<div class=\"panel-group\">-->\r\n              <div class=\"panel panel-default\">\r\n                <div class=\"panel-heading\">\r\n                  <!--<div class=\"date\"> \"Aug\"\r\n                <div class=\"number\">31</div>\r\n                </div>-->\r\n                  <div class=\"row\">\r\n                    <div class=\"col-lg-1 design1\">\r\n                      {{ settle.paid_on | date:'MMM'}}\r\n                      <div class=\"design\">\r\n                        {{ settle.paid_on | date:'dd'}}\r\n                      </div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                      <label class=\"panel-title\" style=\"font-weight:normal\">\r\n                        {{settle.payerId.name }} paid {{settle.payeeId.name}}  &#8377;{{settle.paid_amount}}\r\n                      </label>\r\n                    </div>\r\n\r\n                  </div>\r\n\r\n\r\n                </div>\r\n                <!--<div id=\"\" class=\"panel-collapse collapse\">\r\n                <div class=\"panel-body border-bottom\">\r\n                  <br />\r\n                 fjklf\r\n                </div>\r\n\r\n              </div>-->\r\n                <!--</div>-->\r\n              </div>\r\n            </div>\r\n\r\n\r\n\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n\r\n\r\n\r\n\r\n            <div class=\"billNav\" *ngFor=\"let bill of bills\">\r\n              <!--<div class=\"panel-group\">-->\r\n              <div class=\"panel panel-default\">\r\n                <div class=\"panel-heading\">\r\n                  <!--<div class=\"date\"> \"Aug\"\r\n                <div class=\"number\">31</div>\r\n                </div>-->\r\n                  <div class=\"row\">\r\n                    <div class=\"col-lg-1 design\">\r\n                      {{ bill.bill_created_at | date:'MMM'}}\r\n                      <div class=\"design\">\r\n                        {{ bill.bill_created_at | date:'dd'}}\r\n                      </div>\r\n                    </div>\r\n                    <div class=\"col-lg-7\">\r\n                      <label class=\"panel-title\" style=\"color:grey\">\r\n                        <a data-toggle=\"collapse\" href=\"#{{bill.billid}}\">{{bill.description}}</a>\r\n                      </label>\r\n                    </div>\r\n                    <!--<div class=\"col-lg-4\">\r\n                      <div class=\"col-lg-6 design\">\r\n                        Paid by\r\n                        <div class=\"design\">\r\n                          0000\r\n                        </div>\r\n                      </div>\r\n                      <div class=\"col-lg-6 design\">\r\n                        lent\r\n                        <div class=\"design\">\r\n                          0000\r\n                        </div>\r\n                      </div>\r\n                    </div>-->\r\n                  </div>\r\n\r\n\r\n                </div>\r\n                <div id=\"{{bill.billid}}\" class=\"panel-collapse collapse\">\r\n                  <div class=\"panel-body border-bottom\">\r\n                    {{bill.description}}\r\n                    <br />\r\n                    <h4> &#8377; {{bill.total_amount}}</h4>\r\n                    Added by {{ bill.bill_created_by.name}}\r\n                    on {{bill.bill_created_at | date:'MMMM'}} {{bill.bill_created_at | date:'dd'}},{{bill.bill_created_at | date:'yyyy'}}\r\n                  </div>\r\n                  <div class=\"panel-body\">\r\n                    <div *ngFor=\"let member of bill.sharedwiths\">\r\n                      {{member.name}}\r\n                      <label style=\"font-weight:normal\" *ngFor=\"let memberP of bill.payers\">\r\n                        <label style=\"font-weight:normal\" *ngIf=\"member.id==memberP.id\">\r\n                          paid &#8377;{{ memberP.amount}} and &nbsp;\r\n                        </label>\r\n                      </label>\r\n                      <label style=\"font-weight:normal\">\r\n                        owes &#8377;{{member.amount}}\r\n                      </label>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n                <!--</div>-->\r\n              </div>\r\n            </div>\r\n\r\n\r\n\r\n      \r\n\r\n\r\n\r\n  </div>\r\n\r\n    <div class=\"col-lg-4\">\r\n      <button type=\"button\" class=\"btn\" style=\"background-color:powderblue\" (click)=\"delete()\">\r\n        <span class=\"glyphicon glyphicon-trash\"></span>\r\n      </button>\r\n      <!--<button type=\"button\" class=\"btn\" style=\"background-color:powderblue;position:relative;left:10px\">\r\n        <span class=\"glyphicon glyphicon-list-alt\"></span>\r\n      </button>-->\r\n      <br /><br />\r\n      <div>\r\n        <h4>\r\n          Balance\r\n        </h4>\r\n        <div>\r\n          <label *ngIf=\"balance>0\" style=\"color:green;font-weight:normal\">\r\n            {{friend.user_name}} owes you\r\n            <h3 *ngIf=\"showBalance!=null && showBalance!=0\"> &#8377;{{ showBalance}}</h3>\r\n          </label>\r\n          <label *ngIf=\"balance<0\" style=\"color:red;font-weight:normal\">\r\n            you owe {{ friend.user_name }}\r\n            <h3 *ngIf=\"showBalance!=null && showBalance!=0\"> &#8377;{{ showBalance}}</h3>\r\n          </label>\r\n\r\n          <h4 *ngIf=\"showBalance==0\">You are settled up</h4>\r\n        </div>\r\n      </div>\r\n      <div>\r\n        <h4>\r\n          Detail\r\n        </h4>\r\n        <ul *ngFor=\"let detail of details\">\r\n          <li *ngIf=\"detail.id==0\" style=\"color:red\">\r\n            {{detail.detail}}\r\n          </li>\r\n          <li *ngIf=\"detail.id==1\" style=\"color:green\">\r\n            {{detail.detail}}\r\n          </li>\r\n        </ul>\r\n      </div>\r\n    </div>\r\n  </div>\r\n"
 
 /***/ }),
 
@@ -1230,6 +1486,9 @@ var FriendBoardComponent = /** @class */ (function () {
         this.shareMembers = new Array();
         this.settlement = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["SettlementResponse"]();
         this.settlements = new Array();
+        this.balance = 0;
+        this.details = new Array();
+        this.detail = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["GroupBalanceDetail"]();
         this.friend = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["FriendResponse"]();
         this.user = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["User"]();
     }
@@ -1241,24 +1500,77 @@ var FriendBoardComponent = /** @class */ (function () {
             _this.userid = params['id'];
         });
         this.friend_service.getFriendData(this.id).subscribe(function (data) {
-            console.log(data),
-                _this.friend = data;
+            //  console.log(data),
+            _this.friend = data;
         });
         this.user_service.getUserData(this.userid)
             .subscribe(function (data) { return _this.user = data; });
         this.bill_service.getFriendBills(this.userid, this.id).subscribe(function (data) {
-            _this.bills = data,
-                console.log(_this.bills);
+            _this.bills = data;
+            //this.bills = this.bills.sort((a) => (a as any));
+            //  console.log(this.bills)
+        });
+        this.bill_service.getFriendTransactions(this.userid, this.id)
+            .subscribe(function (data) {
+            _this.transactions = data,
+                console.log(_this.transactions);
+        });
+        this.bill_service.getFriendSettlements(this.userid, this.id)
+            .subscribe(function (data) {
+            _this.frdSettlement = data,
+                console.log(_this.frdSettlement);
+            for (var i = 0; i < _this.frdSettlement.length; i++) {
+                if (_this.userid == _this.frdSettlement[i].payer.id) {
+                    _this.detail = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["GroupBalanceDetail"]();
+                    _this.detail.detail = "You owe " + _this.frdSettlement[i].payee.name + " ₹" + _this.frdSettlement[i].amount;
+                    if (_this.frdSettlement[i].group == null) {
+                        _this.detail.detail = _this.detail.detail + " for " + "'" + "Non Group Expense" + "'";
+                    }
+                    else {
+                        _this.detail.detail = _this.detail.detail + " for " + "'" + _this.frdSettlement[i].group.name + "'";
+                    }
+                    _this.detail.id = 0;
+                    _this.details.push(_this.detail);
+                    _this.balance = _this.balance - _this.frdSettlement[i].amount;
+                }
+                if (_this.userid == _this.frdSettlement[i].payee.id) {
+                    _this.detail = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["GroupBalanceDetail"]();
+                    _this.detail.detail = _this.frdSettlement[i].payer.name + " owes you ₹" + _this.frdSettlement[i].amount;
+                    if (_this.frdSettlement[i].group == null) {
+                        _this.detail.detail = _this.detail.detail + " for " + "'" + "Non Group Expense" + "'";
+                    }
+                    else {
+                        _this.detail.detail = _this.detail.detail + " for " + "'" + _this.frdSettlement[i].group.name + "'";
+                    }
+                    _this.detail.id = 1;
+                    _this.details.push(_this.detail);
+                    _this.balance = _this.balance + _this.frdSettlement[i].amount;
+                }
+            }
+            if (_this.balance < 0)
+                _this.showBalance = 0 - _this.balance;
+            else
+                _this.showBalance = _this.balance;
+            console.log(_this.balance);
+            console.log(_this.details);
         });
     };
     FriendBoardComponent.prototype.delete = function () {
         var _this = this;
         if (confirm("Are you sure you want to remove this friend")) {
-            this.friend_service.removeFriend(this.userid, this.id)
+            this.group_service.getFriendGroups(this.userid, this.id)
                 .subscribe(function (data) {
-                console.log(data),
-                    _this.router.navigate(['/Board', _this.userid]);
-            }, function (error) { return alert("cannot delete friend"); });
+                if (data.length > 0) {
+                    alert("you this friend in group. so you cannot remove friend");
+                }
+                else {
+                    _this.friend_service.removeFriend(_this.userid, _this.id)
+                        .subscribe(function (data) {
+                        console.log(data),
+                            _this.router.navigate(['/Board', _this.userid]);
+                    }, function (error) { return alert("cannot delete friend"); });
+                }
+            });
         }
     };
     FriendBoardComponent.prototype.showpayer = function () {
@@ -1300,7 +1612,8 @@ var FriendBoardComponent = /** @class */ (function () {
         if (this.payers.length == 0) {
             this.payers.push(this.payer);
         }
-        var div = this.addBill.total_amount / 2;
+        var div = Number.parseFloat((this.addBill.total_amount / 2).toFixed(2));
+        // div = Math.round(div);
         this.shareMember = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["SharedWithResponse"]();
         this.shareMember.owes_amount = div;
         this.shareMember.shared_withId = this.id;
@@ -1347,8 +1660,8 @@ var FriendBoardComponent = /** @class */ (function () {
         this.addBill.sharedwiths = this.shareMembers;
         this.addBill.settlements = this.settlements;
         console.log(this.addBill);
-        //this.bill_service.addNewBill(this.addBill)
-        //  .subscribe(data => console.log(data));
+        this.bill_service.addNewBill(this.addBill)
+            .subscribe(function (data) { return console.log(data); });
     };
     FriendBoardComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -1373,7 +1686,7 @@ var FriendBoardComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ".row1{\r\n  height:500px;\r\n}\r\ndiv.navbar{\r\n  background-color:lightgray;\r\n  color:grey;\r\n  height:75px;\r\n}\r\ndiv.navbar1{\r\n  background-color:lightgray;\r\n  color:white;\r\n  height:50px;\r\n  position:relative;\r\n}\r\ndiv.billNav{\r\n  background-color:whitesmoke;\r\n}\r\nlabel.billNav1.nav-link:hover{\r\n  background-color:lightgray;\r\n}\r\n.form-control{\r\n  width:200px;\r\n}\r\n.myscroll.modal-body {\r\n  min-height:initial;\r\n  max-height:300px;\r\n  overflow-y:scroll;\r\n}\r\nlabel.nav-link{\r\n  border-color:black;\r\n  background-color:whitesmoke;\r\n  color:grey\r\n}\r\nlabel.nav-link:hover{\r\n  background-color:gray;\r\n  color:black;\r\n}\r\nlabel.nav-link:active{\r\n  background-color:gray;\r\n  color:black;\r\n}\r\n.modal{\r\n  position:fixed;\r\n  right:100px;\r\n}\r\n.payer.modal.fade:not(.in) .modal-dialog{\r\n    -webkit-transform: translate3d(-25%, 0, 0);\r\n    transform: translate3d(-25%, 0, 0);\r\n}\r\n.payer{\r\n  left:700px;\r\n}\r\n.modal-content.balance{\r\n  height:400px;\r\n  width:600px;\r\n}\r\n.modal-content{\r\n  width:300px;\r\n}\r\n.modal-header{\r\n  background-color:grey;\r\n  color:white;\r\n}\r\n/*.container1{\r\n  position:relative;\r\n  top:20px;\r\n  padding-left:10px;\r\n  width:250px;\r\n  height:300px;\r\n  background-color:whitesmoke;\r\n  overflow-y:scroll;\r\n}*/\r\n.table{\r\n  width:150px;\r\n}\r\n.switch {\r\n  position: relative;\r\n  top:12px;\r\n  left:10px;\r\n  display: inline-block;\r\n  width: 50px;\r\n  height: 27px;\r\n}\r\n/* Hide default HTML checkbox */\r\n.switch input {display:none;}\r\n/* The slider */\r\n.slider {\r\n  position: absolute;\r\n  cursor: pointer;\r\n  top: 0;\r\n  left: 0;\r\n  right: 0;\r\n  bottom: 0;\r\n  background-color: #ccc;\r\n  transition: .4s;\r\n}\r\n.slider:before {\r\n  position: absolute;\r\n  content: \"\";\r\n  height: 20px;\r\n  width: 20px;\r\n  left: 4px;\r\n  bottom: 4px;\r\n  background-color: white;\r\n  transition: .4s;\r\n}\r\ninput:checked + .slider {\r\n  background-color: #2196F3;\r\n}\r\ninput:focus + .slider {\r\n  box-shadow: 0 0 1px #2196F3;\r\n}\r\ninput:checked + .slider:before {\r\n  -webkit-transform: translateX(26px);\r\n  transform: translateX(26px);\r\n}\r\n/* Rounded sliders */\r\n.slider.round {\r\n  border-radius: 34px;\r\n}\r\n.slider.round:before {\r\n  border-radius: 50%;\r\n}\r\n"
+module.exports = ".row.full{\r\n  height:500px;\r\n}\r\n/*.billHead{\r\n  position:relative;\r\n  left:16px;\r\n  width:700px;\r\n}*/\r\ndiv.navbar{\r\n  background-color:lightgray;\r\n  color:grey;\r\n  height:75px;\r\n}\r\ndiv.navbar1{\r\n  background-color:lightgray;\r\n  color:white;\r\n  height:50px;\r\n  position:relative;\r\n}\r\ndiv.billNav{\r\n  background-color:whitesmoke;\r\n}\r\nlabel.billNav1.nav-link:hover{\r\n  background-color:lightgray;\r\n}\r\n.design{\r\n  vertical-align:middle;\r\n  text-align:center;\r\n}\r\n.form-control{\r\n  width:200px;\r\n}\r\n.myscroll {\r\n  min-height:initial;\r\n  max-height:300px;\r\n  overflow-y:scroll;\r\n}\r\nlabel.nav-link{\r\n  border-color:black;\r\n  background-color:whitesmoke;\r\n  color:grey\r\n}\r\nlabel.nav-link:hover{\r\n  background-color:gray;\r\n  color:black;\r\n}\r\nlabel.nav-link:active{\r\n  background-color:gray;\r\n  color:black;\r\n}\r\n.modal{\r\n  position:fixed;\r\n  right:100px;\r\n}\r\n.payer.modal.fade:not(.in) .modal-dialog{\r\n    -webkit-transform: translate3d(-25%, 0, 0);\r\n    transform: translate3d(-25%, 0, 0);\r\n}\r\n.payer{\r\n  left:700px;\r\n}\r\n.modal-content.balance{\r\n  height:400px;\r\n  width:600px;\r\n}\r\n.modal-content{\r\n  width:300px;\r\n}\r\n.modal-header{\r\n  background-color:grey;\r\n  color:white;\r\n}\r\n/*.container1{\r\n  position:relative;\r\n  top:20px;\r\n  padding-left:10px;\r\n  width:250px;\r\n  height:300px;\r\n  background-color:whitesmoke;\r\n  overflow-y:scroll;\r\n}*/\r\n.table{\r\n  width:150px;\r\n}\r\n.switch {\r\n  position: relative;\r\n  top:12px;\r\n  left:10px;\r\n  display: inline-block;\r\n  width: 50px;\r\n  height: 27px;\r\n}\r\n/* Hide default HTML checkbox */\r\n.switch input {display:none;}\r\n/* The slider */\r\n.slider {\r\n  position: absolute;\r\n  cursor: pointer;\r\n  top: 0;\r\n  left: 0;\r\n  right: 0;\r\n  bottom: 0;\r\n  background-color: #ccc;\r\n  transition: .4s;\r\n}\r\n.slider:before {\r\n  position: absolute;\r\n  content: \"\";\r\n  height: 20px;\r\n  width: 20px;\r\n  left: 4px;\r\n  bottom: 4px;\r\n  background-color: white;\r\n  transition: .4s;\r\n}\r\ninput:checked + .slider {\r\n  background-color: #2196F3;\r\n}\r\ninput:focus + .slider {\r\n  box-shadow: 0 0 1px #2196F3;\r\n}\r\ninput:checked + .slider:before {\r\n  -webkit-transform: translateX(26px);\r\n  transform: translateX(26px);\r\n}\r\n/* Rounded sliders */\r\n.slider.round {\r\n  border-radius: 34px;\r\n}\r\n.slider.round:before {\r\n  border-radius: 50%;\r\n}\r\n"
 
 /***/ }),
 
@@ -1384,7 +1697,7 @@ module.exports = ".row1{\r\n  height:500px;\r\n}\r\ndiv.navbar{\r\n  background-
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row1\">\r\n\r\n  <div class=\"col-lg-8 border-right border-dark\">\r\n    <div class=\"navbar navbar-expand-sm\">\r\n      <h3>{{ group.group_name }}</h3>\r\n      <button type=\"button\" class=\"btn btn-success btn-lg\" data-toggle=\"modal\" data-target=\"#GroupBillModal\" style=\"position:absolute;left:500px\">Add Bill</button>\r\n\r\n      <div class=\"modal fade\" id=\"GroupBillModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Add Bill with {{ group.group_name }}</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <form class=\"form\" novalidate>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-list-alt\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"description\" [(ngModel)]=\"addBill.description\" placeholder=\"Description\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"amount\" [(ngModel)]=\"addBill.total_amount\" placeholder=\"00.00\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-calendar\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"date\" [(ngModel)]=\"addBill.bill_date\" placeholder=\"MM-DD-YY\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div>\r\n                  Paid By \r\n                  <a style=\"background-color:lightgray;border-radius:5px;font-weight:bold;min-height:10px\" data-toggle=\"modal\" data-target=\"#GroupBillPayer\">{{ paidby }}</a>\r\n                </div>\r\n                <div>\r\n                  <button type=\"button\" (click)=\"AddBillData()\" class=\"btn btn-success\" data-dismiss=\"modal\">Add</button>\r\n                </div>\r\n              </form>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"GroupBillPayer\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Payer</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body myscroll\">\r\n              <div class=\"payerlist\">\r\n                <label class=\"nav-link\" style=\"font-weight:normal\" *ngFor=\"let member of group.memberLists\" (click)=\"addSinglePayer(member.id)\">\r\n                  {{ member.name }}\r\n                </label>\r\n                <label class=\"nav-link\" (click)=\"showpayer()\">\r\n                  Multiple Payers\r\n                </label>\r\n                <div *ngIf=\"showPayer\">\r\n                  <label class=\"nav-link\" style=\"font-weight:normal\" *ngFor=\"let member of group.memberLists\">\r\n                    {{ member.name }}\r\n                    <div class=\"input-group\">\r\n                      <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                      <input type=\"text\" #amt class=\"form-control\" placeholder=\"0.00\" />\r\n                    </div>\r\n                    <a (click)=\"addpayer(member.id,amt.value)\">Add</a>\r\n                  </label>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <button type=\"button\" class=\"btn btn-danger btn-lg\" style=\"position:absolute;left:600px\">Settle Up</button>\r\n    </div>\r\n\r\n    <div class=\"billNav\" *ngFor=\"let bill of bills\">\r\n      <!--<div class=\"panel-group\">-->\r\n        <div class=\"panel panel-default\">\r\n          <div class=\"panel-heading\">\r\n            <h4 class=\"panel-title\">\r\n              <!--<div class=\"date\"> \"Aug\"\r\n              <div class=\"number\">31</div>\r\n              </div>-->\r\n            \r\n              <a data-toggle=\"collapse\" href=\"#{{bill.billid}}\">{{bill.description}}</a>\r\n            </h4>\r\n          </div>\r\n          <div id=\"{{bill.billid}}\" class=\"panel-collapse collapse\">\r\n            <div class=\"panel-body\">\r\n            {{bill.description}}\r\n            added by {{ bill.bill_created_by.name}}\r\n            on {{bill.bill_created_at}}</div>\r\n            <div class=\"panel-footer\">{{bill}}</div>\r\n\r\n          </div>\r\n        <!--</div>-->\r\n      </div>\r\n    </div>\r\n   \r\n\r\n\r\n  </div>\r\n\r\n  <div class=\"col-lg-4\">\r\n    <button type=\"button\" class=\"btn\" style=\"background-color:powderblue\"\r\n            data-toggle=\"modal\" data-target=\"#GroupSettingModal\">\r\n      Group Settings\r\n    </button>\r\n\r\n    <!--(click)=\"show()\"-->\r\n\r\n    <div class=\"modal fade\" id=\"GroupSettingModal\" role=\"dialog\">\r\n      <div class=\"modal-dialog\">\r\n\r\n        <!-- Modal content-->\r\n        <div class=\"modal-content\">\r\n          <div class=\"modal-header\">\r\n            <h4 class=\"modal-title\"> {{ group.group_name }} Setting</h4>\r\n            <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n          </div>\r\n          <div class=\"modal-body myscroll\">\r\n\r\n            <div>\r\n                <form class=\"form-horizontal\" (ngSubmit)=\"onSubmit()\">\r\n\r\n\r\n                  <label for=\"group_name\">Group name</label>\r\n                  <input type=\"text\" class=\"form-control\" name=\"group_name\" [(ngModel)]=\"group.group_name\" /><br />\r\n                  <label>Group Members</label>\r\n                  <br />\r\n                  <table class=\"table\">\r\n                    <tbody *ngFor=\"let member of group.memberLists\">\r\n                      <tr>\r\n                        <td>\r\n                          {{ member.name }}\r\n                        </td>\r\n                        <td>\r\n                          <span class=\"glyphicon glyphicon-remove-circle\" (click)=\"remove(member.id)\" style=\"color:red\"></span>\r\n                        </td>\r\n                      </tr>\r\n                    </tbody>\r\n                  </table>\r\n\r\n                  <label>Simplfy Group Depts</label>\r\n                  <label class=\"switch\">\r\n                    <input type=\"checkbox\" id=\"depth\" name=\"depth\" (change)=\"toggleEditable($event)\" checked=\"{{status}}\">\r\n                    <span class=\"slider round\"></span>\r\n                  </label>\r\n                  <br /><br />\r\n                  <button type=\"button\" class=\"btn\" (click)=\"showList()\">Add new member</button>\r\n                  <br />\r\n                  <div *ngIf=\"showlist\">\r\n                    <table class=\"table\">\r\n                      <tbody *ngFor=\"let member of friends\">\r\n                        <tr>\r\n                          <td>\r\n                            {{ member.user_name }}\r\n                          </td>\r\n                          <td>\r\n                            <span class=\"glyphicon glyphicon-ok-circle\" style=\"color:green\" (click)=\"add(member.userid)\"></span>\r\n                          </td>\r\n                        </tr>\r\n                      </tbody>\r\n                    </table>\r\n                  </div>\r\n                  <br />\r\n                  <div>\r\n                    <button type=\"button\" class=\"btn btn-danger\" (click)=\"delete()\">Delete</button>\r\n                    <button type=\"submit\" class=\"btn btn-success\" style=\"position:relative; left:10px\">Save</button>\r\n                    <button type=\"button\" class=\"btn btn-warning\" style=\"position:relative;left:20px\" (click)=\"show()\">Cancel</button>\r\n                  </div>\r\n                </form>\r\n              </div>\r\n          </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n            <button type=\"button\" class=\"btn\" style=\"background-color:powderblue;position:relative;left:10px\">\r\n              <span class=\"glyphicon glyphicon-list-alt\"></span>\r\n            </button>\r\n            <br /><br />\r\n            <div>\r\n              <h4>\r\n                Group Balance\r\n              </h4>\r\n              <div *ngFor=\"let member of group.memberLists\">\r\n                <label>\r\n                  <span class=\"glyphicon glyphicon-user\" style=\"color:grey\"></span>\r\n                  {{ member.name }}\r\n                </label>\r\n                <br />\r\n                <div *ngFor=\"let balance of groupBalance\">\r\n                  <div *ngIf=\"member.id==balance.member\">\r\n                    <label *ngIf=\"balance.status=='gets'\" style=\"color:green\">\r\n                      {{ balance.status }}\r\n                      {{balance.amt}}\r\n                    </label>\r\n                    <label *ngIf=\"balance.status=='owes'\" style=\"color:red\">\r\n                      {{ balance.status }}\r\n                      {{balance.amt}}\r\n                    </label>\r\n                    <label *ngIf=\"balance.status=='settled'\" style=\"color:gray\">\r\n                      {{ balance.status }}\r\n                    </label>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div>\r\n              <a data-toggle=\"modal\" data-target=\"#GroupSettlementDetail\">\r\n                Detail\r\n              </a>\r\n\r\n\r\n              <div class=\"modal fade\" id=\"GroupSettlementDetail\" role=\"dialog\">\r\n                <div class=\"modal-dialog\">\r\n\r\n                  <!-- Modal content-->\r\n                  <div class=\"modal-content balance\">\r\n                    <div class=\"modal-header\">\r\n                      <h4 class=\"modal-title\">Group Balances</h4>\r\n                      <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n                    </div>\r\n                    <div class=\"modal-body\">\r\n                     <div class=\"row\" *ngFor=\"let member of group.memberLists\">\r\n                       <div class=\"col-lg-4\">\r\n                         <label>\r\n                           <span class=\"glyphicon glyphicon-user\" style=\"color:grey\"></span>\r\n                           {{ member.name }}\r\n                         </label>\r\n                         <br />\r\n                         <div *ngFor=\"let balance of groupBalance\">\r\n                           <div *ngIf=\"member.id==balance.member\">\r\n                             <label *ngIf=\"balance.status=='gets'\" style=\"color:green\">\r\n                               {{ balance.status }}\r\n                               {{balance.amt}}\r\n                             </label>\r\n                             <label *ngIf=\"balance.status=='owes'\" style=\"color:red\">\r\n                               {{ balance.status }}\r\n                               {{balance.amt}}\r\n                             </label>\r\n                             <label *ngIf=\"balance.status=='settled'\" style=\"color:gray\">\r\n                               {{ balance.status }}\r\n                             </label>\r\n                           </div>\r\n                         </div>\r\n                       </div>\r\n                       <div class=\"col-lg-8\">\r\n                         <div>\r\n                          show details\r\n                         </div>\r\n                       </div>\r\n                     </div>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n\r\n\r\n            </div>\r\n\r\n          \r\n          </div>\r\n        </div>\r\n"
+module.exports = "<div class=\"row full\">\r\n\r\n  <div class=\"col-lg-8 border-right border-dark\">\r\n    <div class=\"navbar navbar-expand-sm\">\r\n      <h3>{{ group.group_name }}</h3>\r\n      <button type=\"button\" class=\"btn btn-success btn-lg\" data-toggle=\"modal\" data-target=\"#GroupBillModal\" style=\"position:absolute;left:600px\">Add Bill</button>\r\n\r\n      <div class=\"modal fade\" id=\"GroupBillModal\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Add Bill with {{ group.group_name }}</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n              <form class=\"form\" novalidate>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-list-alt\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"description\" [(ngModel)]=\"addBill.description\" placeholder=\"Description\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"amount\" [(ngModel)]=\"addBill.total_amount\" placeholder=\"00.00\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div class=\"form-group\">\r\n                  <div class=\"input-group\">\r\n                    <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-calendar\"></i></span>\r\n                    <input type=\"text\" class=\"form-control\" name=\"date\" [(ngModel)]=\"addBill.bill_date\" placeholder=\"MM-DD-YY\" />\r\n                  </div>\r\n                </div>\r\n\r\n                <div>\r\n                  Paid By\r\n                  <a style=\"background-color:lightgray;border-radius:5px;font-weight:bold;min-height:10px\" data-toggle=\"modal\" data-target=\"#GroupBillPayer\">{{ paidby }}</a>\r\n                </div>\r\n                <div>\r\n                  <button type=\"button\" (click)=\"AddBillData()\" class=\"btn btn-success\" data-dismiss=\"modal\">Add</button>\r\n                </div>\r\n              </form>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <div class=\"modal fade payer\" id=\"GroupBillPayer\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Choose Payer</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body myscroll\">\r\n              <div class=\"payerlist\">\r\n                <label class=\"nav-link\" style=\"font-weight:normal\" *ngFor=\"let member of group.memberLists\" (click)=\"addSinglePayer(member.id)\">\r\n                  {{ member.name }}\r\n                </label>\r\n                <label class=\"nav-link\" (click)=\"showpayer()\">\r\n                  Multiple Payers\r\n                </label>\r\n                <div *ngIf=\"showPayer\">\r\n                  <label class=\"nav-link\" style=\"font-weight:normal\" *ngFor=\"let member of group.memberLists\">\r\n                    {{ member.name }}\r\n                    <div class=\"input-group\">\r\n                      <span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-usd\"></i></span>\r\n                      <input type=\"text\" #amt class=\"form-control\" placeholder=\"0.00\" />\r\n                    </div>\r\n                    <a (click)=\"addpayer(member.id,amt.value)\">Add</a>\r\n                  </label>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n    </div>\r\n\r\n    <div class=\"billNav\">\r\n      <!--<div class=\"panel-group\">-->\r\n      <div class=\"panel panel-default\">\r\n        <div class=\"panel-heading\">\r\n         \r\n          <div class=\"row\">\r\n            <div class=\"col-lg-11\">\r\n              <label class=\"panel-title\" style=\"color:grey\">\r\n                <a data-toggle=\"collapse\" href=\"#set\">Settlements</a>\r\n              </label>\r\n            </div>\r\n\r\n          </div>\r\n\r\n\r\n        </div>\r\n        <div id=\"set\" class=\"panel-collapse collapse\">\r\n          <div class=\"panel-body\">\r\n\r\n            <div class=\"billNav\" *ngFor=\"let settle of transactions\">\r\n              <!--<div class=\"panel-group\">-->\r\n              <div class=\"panel panel-default\">\r\n                <div class=\"panel-heading\">\r\n                  <!--<div class=\"date\"> \"Aug\"\r\n                <div class=\"number\">31</div>\r\n                </div>-->\r\n                  <div class=\"row\">\r\n                    <div class=\"col-lg-1 design1\">\r\n                      {{ settle.paid_on | date:'MMM'}}\r\n                      <div class=\"design\">\r\n                        {{ settle.paid_on | date:'dd'}}\r\n                      </div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                      <label class=\"panel-title\" style=\"font-weight:normal\">\r\n                        {{settle.payerId.name }} paid {{settle.payeeId.name}} &#8377;{{settle.paid_amount}}\r\n                      </label>\r\n                    </div>\r\n\r\n                  </div>\r\n\r\n\r\n                </div>\r\n                <!--<div id=\"\" class=\"panel-collapse collapse\">\r\n                <div class=\"panel-body border-bottom\">\r\n                  <br />\r\n                 fjklf\r\n                </div>\r\n\r\n              </div>-->\r\n                <!--</div>-->\r\n              </div>\r\n            </div>\r\n\r\n\r\n\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n\r\n    <div class=\"billNav\" *ngFor=\"let bill of bills\">\r\n      <!--<div class=\"panel-group\">-->\r\n      <div class=\"panel panel-default\">\r\n        <div class=\"panel-heading\">\r\n          <!--<div class=\"date\"> \"Aug\"\r\n        <div class=\"number\">31</div>\r\n        </div>-->\r\n          <div class=\"row\">\r\n            <div class=\"col-lg-1 design\">\r\n              {{ bill.bill_created_at | date:'MMM'}}\r\n              <div class=\"design\">\r\n                {{ bill.bill_created_at | date:'dd'}}\r\n              </div>\r\n            </div>\r\n            <div class=\"col-lg-6\">\r\n              <label class=\"panel-title\" style=\"color:grey\">\r\n                <a data-toggle=\"collapse\" href=\"#{{bill.billid}}\">{{bill.description}}</a>\r\n              </label>\r\n            </div>\r\n            <!--<div class=\"col-lg-5\">\r\n              <div class=\"col-lg-6 design\">\r\n                <label style=\"font-size:smaller;font-weight:normal\">\r\n                  {{bill.payers.length | number}} people  Paid\r\n                </label>   \r\n                <div class=\"design\">\r\n                  {{bill.total_amount}}\r\n                </div>\r\n              </div>\r\n              <div class=\"col-lg-6 design\">\r\n                lent\r\n                <div class=\"design\">\r\n                  0000\r\n                </div>\r\n              </div>\r\n            </div>-->\r\n          </div>\r\n\r\n\r\n        </div>\r\n        <div id=\"{{bill.billid}}\" class=\"panel-collapse collapse\">\r\n          <div class=\"panel-body border-bottom\">\r\n            {{bill.description}}\r\n            <br />\r\n            <h4> &#8377;{{bill.total_amount}}</h4>\r\n            Added by {{ bill.bill_created_by.name}}\r\n            on {{bill.bill_created_at | date:'MMMM'}} {{bill.bill_created_at | date:'dd'}},{{bill.bill_created_at | date:'yyyy'}}\r\n          </div>\r\n          <div class=\"panel-body\">\r\n            <div *ngFor=\"let member of bill.sharedwiths\">\r\n              {{member.name}}\r\n              <label style=\"font-weight:normal\" *ngFor=\"let memberP of bill.payers\">\r\n                <label style=\"font-weight:normal\" *ngIf=\"member.id==memberP.id\">\r\n                  paid &#8377;{{ memberP.amount}} and &nbsp;\r\n                </label>\r\n              </label>\r\n              <label style=\"font-weight:normal\">\r\n                owes &#8377;{{member.amount}}\r\n              </label>\r\n            </div>\r\n          </div>\r\n        </div>\r\n        <!--</div>-->\r\n      </div>\r\n    </div>\r\n\r\n\r\n\r\n  </div>\r\n\r\n  <div class=\"col-lg-4\">\r\n    <button type=\"button\" class=\"btn\" style=\"background-color:powderblue\" (click)=\"ShowBalance()\">\r\n      <span class=\"glyphicon glyphicon-list-alt\"></span>\r\n    </button>\r\n\r\n    <button type=\"button\" class=\"btn\" style=\"background-color:powderblue;position:relative;left:10px\" (click)=\"ShowSetting()\">\r\n      Group Settings\r\n    </button>\r\n\r\n\r\n\r\n\r\n    <!--<div class=\"modal fade\" id=\"GroupSettingModal\" role=\"dialog\">\r\n    <div class=\"modal-dialog\">\r\n\r\n       Modal content\r\n      <div class=\"modal-content\">\r\n        <div class=\"modal-header\">\r\n          <h4 class=\"modal-title\"> {{ group.group_name }} Setting</h4>\r\n          <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n        </div>\r\n        <div class=\"modal-body myscroll\">\r\n\r\n          <div>\r\n            <form class=\"form-horizontal\" (ngSubmit)=\"onSubmit()\">\r\n\r\n\r\n              <label for=\"group_name\">Group name</label>\r\n              <input type=\"text\" class=\"form-control\" name=\"group_name\" [(ngModel)]=\"group.group_name\" /><br />\r\n              <label>Group Members</label>\r\n              <br />\r\n              <table class=\"table\">\r\n                <tbody *ngFor=\"let member of group.memberLists\">\r\n                  <tr>\r\n                    <td>\r\n                      {{ member.name }}\r\n                    </td>\r\n                    <td>\r\n                      <span class=\"glyphicon glyphicon-remove-circle\" (click)=\"remove(member.id)\" style=\"color:red\"></span>\r\n                    </td>\r\n                  </tr>\r\n                </tbody>\r\n              </table>\r\n\r\n              <label>Simplfy Group Depts</label>\r\n              <label class=\"switch\">\r\n                <input type=\"checkbox\" id=\"depth\" name=\"depth\" (change)=\"toggleEditable($event)\" checked=\"{{status}}\">\r\n                <span class=\"slider round\"></span>\r\n              </label>\r\n              <br /><br />\r\n              <button type=\"button\" class=\"btn\" (click)=\"showList()\">Add new member</button>\r\n              <br />\r\n              <div *ngIf=\"showlist\">\r\n                <table class=\"table\">\r\n                  <tbody *ngFor=\"let member of friends\">\r\n                    <tr>\r\n                      <td>\r\n                        {{ member.user_name }}\r\n                      </td>\r\n                      <td>\r\n                        <span class=\"glyphicon glyphicon-ok-circle\" style=\"color:green\" (click)=\"add(member.userid)\"></span>\r\n                      </td>\r\n                    </tr>\r\n                  </tbody>\r\n                </table>\r\n              </div>\r\n              <br />\r\n              <div>\r\n                <button type=\"button\" class=\"btn btn-danger\" (click)=\"delete()\" data-dismiss=\"modal\">Delete</button>\r\n                <button type=\"submit\" class=\"btn btn-success\" style=\"position:relative; left:10px\" data-dismiss=\"modal\">Save</button>\r\n                <button type=\"button\" class=\"btn btn-warning\" style=\"position:relative;left:20px\" data-dismiss=\"modal\">Cancel</button>\r\n              </div>\r\n            </form>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>-->\r\n\r\n\r\n    <br /><br />\r\n\r\n    <div *ngIf=\"showSettings\">\r\n      <h4>Group Settings</h4>\r\n      <div>\r\n        <form class=\"form-horizontal\" (ngSubmit)=\"onSubmit()\">\r\n\r\n\r\n          <label for=\"group_name\">Group name</label>\r\n          <input type=\"text\" class=\"form-control\" name=\"group_name\" [(ngModel)]=\"group.group_name\" /><br />\r\n          <label>Group Members</label>\r\n          <br />\r\n          <table class=\"table\">\r\n            <tbody *ngFor=\"let member of group.memberLists\">\r\n              <tr>\r\n                <td>\r\n                  {{ member.name }}\r\n                </td>\r\n                <td>\r\n                  <span class=\"glyphicon glyphicon-remove-circle\" (click)=\"remove(member.id)\" style=\"color:red\"></span>\r\n                </td>\r\n              </tr>\r\n            </tbody>\r\n          </table>\r\n\r\n          <label>Simplfy Group Depts</label>\r\n          <label class=\"switch\">\r\n            <input type=\"checkbox\" id=\"depth\" name=\"depth\" (change)=\"toggleEditable($event)\" checked=\"{{status}}\">\r\n            <span class=\"slider round\"></span>\r\n          </label>\r\n          <br /><br />\r\n          <button type=\"button\" class=\"btn\" (click)=\"showList()\">Add new member</button>\r\n          <br />\r\n          <br />\r\n          <div *ngIf=\"showlist\">\r\n            <table class=\"table\">\r\n              <tbody *ngFor=\"let member of nonGroupFriends\">\r\n                <tr>\r\n                  <td>\r\n                    {{ member.user_name }}\r\n                  </td>\r\n                  <td>\r\n                    <span class=\"glyphicon glyphicon-ok-circle\" style=\"color:green\" (click)=\"add(member.userid)\"></span>\r\n                  </td>\r\n                </tr>\r\n              </tbody>\r\n            </table>\r\n          </div>\r\n          <br />\r\n          <div>\r\n            <button type=\"button\" class=\"btn btn-danger\" (click)=\"delete()\">Delete</button>\r\n            <button type=\"submit\" class=\"btn btn-success\" style=\"position:relative; left:10px\">Save</button>\r\n          </div>\r\n        </form>\r\n      </div>\r\n\r\n    </div>\r\n\r\n\r\n    <div *ngIf=\"showBalance\">\r\n      <h4>\r\n        Group Balance\r\n      </h4>\r\n      <div *ngFor=\"let member of group.memberLists\">\r\n        <label style=\"color:gray;font-size:medium\">\r\n          <span class=\"glyphicon glyphicon-user\" style=\"color:grey\"></span>\r\n          {{ member.name }}\r\n        </label>\r\n        <br />\r\n        <div *ngFor=\"let balance of groupBalance\">\r\n          <div *ngIf=\"member.id==balance.member.id\">\r\n            <label *ngIf=\"balance.status=='gets'\" style=\"color:green;font-weight:normal\">\r\n              {{ balance.status }}\r\n              &#8377;{{balance.amt}}\r\n            </label>\r\n            <label *ngIf=\"balance.status=='owes'\" style=\"color:red;font-weight:normal\">\r\n              {{ balance.status }}\r\n              &#8377;{{balance.amt}}\r\n            </label>\r\n            <label *ngIf=\"balance.status=='settled'\" style=\"color:gray;font-weight:normal\">\r\n              {{ balance.status }}\r\n            </label>\r\n          </div>\r\n        </div>\r\n      </div>\r\n      <a data-toggle=\"modal\" data-target=\"#GroupSettlementDetail\">\r\n        Detail\r\n      </a>\r\n    </div>\r\n    <div>\r\n\r\n\r\n\r\n      <div class=\"modal fade\" id=\"GroupSettlementDetail\" role=\"dialog\">\r\n        <div class=\"modal-dialog\">\r\n\r\n          <!-- Modal content-->\r\n          <div class=\"modal-content balance\">\r\n            <div class=\"modal-header\">\r\n              <h4 class=\"modal-title\">Group Balances</h4>\r\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n            </div>\r\n            <div class=\"modal-body myscroll\">\r\n              <div class=\"row nav-link\" *ngFor=\"let member of group.memberLists\">\r\n                <div class=\"col-lg-4 nav-item\">\r\n                  <label style=\"color:gray;font-size:medium\">\r\n                    <span class=\"glyphicon glyphicon-user\" style=\"color:grey\"></span>\r\n                    {{ member.name }}\r\n                  </label>\r\n                  <br />\r\n                  <div *ngFor=\"let balance of groupBalance\">\r\n                    <div *ngIf=\"member.id==balance.member.id\">\r\n                      <label *ngIf=\"balance.status=='gets'\" style=\"color:green;font-weight:normal\">\r\n                        {{ balance.status }}\r\n                        &#8377;{{balance.amt}}\r\n                      </label>\r\n                      <label *ngIf=\"balance.status=='owes'\" style=\"color:red;font-weight:normal\">\r\n                        {{ balance.status }}\r\n                        &#8377;{{balance.amt}}\r\n                      </label>\r\n                      <label *ngIf=\"balance.status=='settled'\" style=\"color:gray;font-weight:normal\">\r\n                       {{ balance.status }}\r\n                      </label>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-lg-8 nav-item\">\r\n                  <div *ngFor=\"let detail of details\">\r\n                    <ul *ngIf=\"detail.id==member.id\">\r\n                      <li style=\"color:grey\">{{ detail.detail }}</li>\r\n                    </ul>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"modal-footer\">\r\n              <button class=\"btn\" data-dismiss=\"modal\">Close</button>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n\r\n    </div>\r\n\r\n\r\n  </div>\r\n        </div>\r\n"
 
 /***/ }),
 
@@ -1404,6 +1717,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_Model__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Models/Model */ "./src/app/Models/Model.ts");
 /* harmony import */ var _Services_UserService__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Services/UserService */ "./src/app/Services/UserService.ts");
 /* harmony import */ var _Services_BillService__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Services/BillService */ "./src/app/Services/BillService.ts");
+/* harmony import */ var _Services_HubService__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../Services/HubService */ "./src/app/Services/HubService.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1419,10 +1733,12 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
 var GroupBoardComponent = /** @class */ (function () {
-    function GroupBoardComponent(route, router, bill_service, group_service, user_service) {
+    function GroupBoardComponent(route, router, service, bill_service, group_service, user_service) {
         this.route = route;
         this.router = router;
+        this.service = service;
         this.bill_service = bill_service;
         this.group_service = group_service;
         this.user_service = user_service;
@@ -1437,6 +1753,9 @@ var GroupBoardComponent = /** @class */ (function () {
         this.settlements = new Array();
         this.groupBalance = new Array();
         this.balance = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["GroupBalance"]();
+        this.info = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["Detail"]();
+        this.details = new Array();
+        this.detail = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["GroupBalanceDetail"]();
         this.sett = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["settle"]();
         //setts = new Array<settle>();
         this.setPayers = new Array();
@@ -1445,6 +1764,8 @@ var GroupBoardComponent = /** @class */ (function () {
         this.showlist = false;
         this.showPayer = false;
         this.amount = "";
+        this.showSettings = false;
+        this.showBalance = true;
         this.showbill = false;
     }
     GroupBoardComponent.prototype.ngOnInit = function () {
@@ -1456,8 +1777,8 @@ var GroupBoardComponent = /** @class */ (function () {
         });
         this.paidby = "Select Payer";
         this.group_service.GetGroupInfo(this.id).subscribe(function (data) {
-            console.log(data),
-                _this.group = data;
+            //  console.log(data),
+            _this.group = data;
             if (_this.group.is_simplified_depts == true) {
                 _this.status = true;
                 _this.isDepth = _this.status;
@@ -1465,39 +1786,63 @@ var GroupBoardComponent = /** @class */ (function () {
             _this.bill_service.getGroupSettlement(_this.userid, _this.id)
                 .subscribe(function (data) {
                 _this.GroupSettlements = data,
-                    console.log(_this.GroupSettlements);
-                for (var i = 0; i < _this.group.memberLists.length; i++) {
-                    _this.balance = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["GroupBalance"]();
-                    _this.balance.member = _this.group.memberLists[i].id;
-                    _this.balance.amt = 0;
-                    for (var j = 0; j < _this.GroupSettlements.length; j++) {
-                        if (_this.group.memberLists[i].id == _this.GroupSettlements[j].payer.id) {
-                            _this.balance.amt = _this.balance.amt - _this.GroupSettlements[j].amount;
+                    //  console.log(this.GroupSettlements);
+                    _this.user_service.getFriends(_this.userid).subscribe(function (data) {
+                        _this.friends = data,
+                            _this.nonGroupFriends = data;
+                        for (var i = 0; i < _this.group.memberLists.length; i++) {
+                            var place = _this.nonGroupFriends.findIndex(function (c) { return c.userid == _this.group.memberLists[i].id; });
+                            // console.log(place);
+                            if (place >= 0) {
+                                _this.nonGroupFriends.splice(place, 1);
+                            }
+                            _this.balance = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["GroupBalance"]();
+                            _this.info = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["Detail"]();
+                            _this.info.id = _this.group.memberLists[i].id;
+                            _this.info.name = _this.group.memberLists[i].name;
+                            _this.balance.member = _this.info;
+                            _this.balance.amt = 0;
+                            for (var j = 0; j < _this.GroupSettlements.length; j++) {
+                                if (_this.GroupSettlements[j].amount != 0) {
+                                    if (_this.group.memberLists[i].id == _this.GroupSettlements[j].payer.id) {
+                                        _this.detail = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["GroupBalanceDetail"]();
+                                        _this.detail.id = _this.group.memberLists[i].id;
+                                        _this.detail.detail = _this.group.memberLists[i].name + " owes ₹" + _this.GroupSettlements[j].amount
+                                            + " to " + _this.GroupSettlements[j].payee.name;
+                                        _this.details.push(_this.detail);
+                                        _this.balance.amt = _this.balance.amt - _this.GroupSettlements[j].amount;
+                                    }
+                                    if (_this.group.memberLists[i].id == _this.GroupSettlements[j].payee.id) {
+                                        _this.detail = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["GroupBalanceDetail"]();
+                                        _this.detail.id = _this.group.memberLists[i].id;
+                                        _this.detail.detail = _this.group.memberLists[i].name + " owes " + _this.GroupSettlements[j].payer.name + " ₹" + _this.GroupSettlements[j].amount;
+                                        _this.details.push(_this.detail);
+                                        _this.balance.amt = _this.balance.amt + _this.GroupSettlements[j].amount;
+                                    }
+                                }
+                            }
+                            if (_this.balance.amt == 0)
+                                _this.balance.status = "settled";
+                            else if (_this.balance.amt < 0) {
+                                _this.balance.amt = 0 - _this.balance.amt;
+                                _this.balance.status = "owes";
+                            }
+                            else
+                                _this.balance.status = "gets";
+                            _this.groupBalance.push(_this.balance);
                         }
-                        if (_this.group.memberLists[i].id == _this.GroupSettlements[j].payee.id) {
-                            _this.balance.amt = _this.balance.amt + _this.GroupSettlements[j].amount;
-                        }
-                    }
-                    if (_this.balance.amt == 0)
-                        _this.balance.status = "settled";
-                    else if (_this.balance.amt < 0) {
-                        _this.balance.amt = 0 - _this.balance.amt;
-                        _this.balance.status = "owes";
-                    }
-                    else
-                        _this.balance.status = "gets";
-                    _this.groupBalance.push(_this.balance);
-                }
-                console.log(_this.groupBalance);
+                        //  console.log(this.groupBalance);
+                        // console.log(this.details);
+                        console.log(_this.nonGroupFriends);
+                    });
             });
         });
-        this.user_service.getFriends(this.userid).subscribe(function (data) {
-            _this.friends = data;
-        });
         this.bill_service.getGroupBills(this.id).subscribe(function (data) {
-            _this.bills = data;
-            //   console.log(this.bills)
+            _this.bills = data,
+                console.log(_this.bills);
         });
+        this.bill_service.getGroupTransactions(this.id)
+            .subscribe(function (data) { return _this.transactions = data; });
     };
     GroupBoardComponent.prototype.toggleEditable = function (event) {
         if (event.target.checked) {
@@ -1508,10 +1853,15 @@ var GroupBoardComponent = /** @class */ (function () {
         }
     };
     GroupBoardComponent.prototype.add = function (userid) {
-        this.group_service.addGroupMember(userid, this.id).subscribe(function (data) { return console.log(data); });
+        var _this = this;
+        this.group_service.addGroupMember(userid, this.id).subscribe(function (data) {
+            console.log(data),
+                _this.service.update();
+        });
     };
     GroupBoardComponent.prototype.remove = function (userid) {
-        this.group_service.removeGroupMember(userid, this.id).subscribe(function (data) { return console.log(data); });
+        var _this = this;
+        this.group_service.removeGroupMember(userid, this.id).subscribe(function (data) { console.log(data), _this.service.update(); }, function (error) { return alert("member have pending settlements in group"); });
     };
     GroupBoardComponent.prototype.showList = function () {
         if (this.showlist == false)
@@ -1533,16 +1883,22 @@ var GroupBoardComponent = /** @class */ (function () {
         else
             this.showbill = false;
     };
-    GroupBoardComponent.prototype.show = function () {
-        if (this.showvarible == false)
-            this.showvarible = true;
-        else
-            this.showvarible = false;
+    GroupBoardComponent.prototype.ShowSetting = function () {
+        this.showSettings = true;
+        this.showBalance = false;
+    };
+    GroupBoardComponent.prototype.ShowBalance = function () {
+        this.showBalance = true;
+        this.showSettings = false;
     };
     GroupBoardComponent.prototype.delete = function () {
+        var _this = this;
         if (confirm("Are you sure you want to delete this group")) {
-            this.group_service.deleteGroup(this.id).subscribe(function (data) { return console.log(data); });
-            this.router.navigate(['/Board', this.userid]);
+            this.group_service.deleteGroup(this.id)
+                .subscribe(function (data) {
+                console.log(data),
+                    _this.router.navigate(['/Board', _this.userid]);
+            }, function (error) { return alert("settlemets still exist"); });
         }
     };
     GroupBoardComponent.prototype.onSubmit = function () {
@@ -1580,7 +1936,8 @@ var GroupBoardComponent = /** @class */ (function () {
         if (this.payers.length == 0) {
             this.payers.push(this.payer);
         }
-        var div = this.addBill.total_amount / this.group.memberLists.length;
+        var div = Number.parseFloat((this.addBill.total_amount / this.group.memberLists.length).toFixed(2));
+        // div = Math.round(div);
         for (var i = 0; i < this.group.memberLists.length; i++) {
             this.shareMember = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["SharedWithResponse"]();
             this.shareMember.owes_amount = div;
@@ -1718,7 +2075,7 @@ var GroupBoardComponent = /** @class */ (function () {
             template: __webpack_require__(/*! ./group-board.component.html */ "./src/app/group-board/group-board.component.html"),
             styles: [__webpack_require__(/*! ./group-board.component.css */ "./src/app/group-board/group-board.component.css")]
         }),
-        __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_1__["ActivatedRoute"], _angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"],
+        __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_1__["ActivatedRoute"], _angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"], _Services_HubService__WEBPACK_IMPORTED_MODULE_6__["HubConnectionService"],
             _Services_BillService__WEBPACK_IMPORTED_MODULE_5__["BillService"], _Services_GroupService__WEBPACK_IMPORTED_MODULE_2__["GroupService"], _Services_UserService__WEBPACK_IMPORTED_MODULE_4__["UserService"]])
     ], GroupBoardComponent);
     return GroupBoardComponent;
@@ -1859,6 +2216,7 @@ var LoginComponent = /** @class */ (function () {
             _this.router.navigate(['/Board', _this.id]);
         }, function (error) {
             alert("Incorrect check id or password");
+            _this.user = new _Models_Model__WEBPACK_IMPORTED_MODULE_2__["User"]();
         });
     };
     LoginComponent = __decorate([
@@ -1942,7 +2300,8 @@ var RegisterComponent = /** @class */ (function () {
             console.log(_this.id);
             _this.router.navigate(['/Board', _this.id]);
         }, function (error) {
-            alert("Incorrect check id or password");
+            alert("Id already exist. Plz user another id.");
+            _this.user = new _Models_Model__WEBPACK_IMPORTED_MODULE_3__["User"]();
         });
         console.log(this.id);
     };
@@ -1984,6 +2343,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _friend_board_friend_board_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./friend-board/friend-board.component */ "./src/app/friend-board/friend-board.component.ts");
 /* harmony import */ var _Services_FriendService__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./Services/FriendService */ "./src/app/Services/FriendService.ts");
 /* harmony import */ var _Services_BillService__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./Services/BillService */ "./src/app/Services/BillService.ts");
+/* harmony import */ var _expense_expense_component__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./expense/expense.component */ "./src/app/expense/expense.component.ts");
+/* harmony import */ var _Services_HubService__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./Services/HubService */ "./src/app/Services/HubService.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -2003,11 +2364,14 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 
 
 
+
+
 var appRoutes = [
     {
         path: 'Board/:id',
         component: _board_board_component__WEBPACK_IMPORTED_MODULE_2__["BoardComponent"],
         children: [
+            { path: 'expense', component: _expense_expense_component__WEBPACK_IMPORTED_MODULE_13__["ExpenseComponent"] },
             { path: '', component: _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"] },
             { path: 'dashboard', component: _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"] },
             { path: 'group/:gpid', component: _group_board_group_board_component__WEBPACK_IMPORTED_MODULE_8__["GroupBoardComponent"] },
@@ -2036,9 +2400,10 @@ var RoutingModuleModule = /** @class */ (function () {
                 _user_setting_user_setting_component__WEBPACK_IMPORTED_MODULE_9__["UserSettingComponent"],
                 _friend_board_friend_board_component__WEBPACK_IMPORTED_MODULE_10__["FriendBoardComponent"],
                 _group_board_group_board_component__WEBPACK_IMPORTED_MODULE_8__["GroupBoardComponent"],
+                _expense_expense_component__WEBPACK_IMPORTED_MODULE_13__["ExpenseComponent"],
                 _create_group_create_group_component__WEBPACK_IMPORTED_MODULE_5__["CreateGroupComponent"]
             ],
-            providers: [_Services_GroupService__WEBPACK_IMPORTED_MODULE_7__["GroupService"], _Services_FriendService__WEBPACK_IMPORTED_MODULE_11__["FriendService"], _Services_BillService__WEBPACK_IMPORTED_MODULE_12__["BillService"]],
+            providers: [_Services_GroupService__WEBPACK_IMPORTED_MODULE_7__["GroupService"], _Services_FriendService__WEBPACK_IMPORTED_MODULE_11__["FriendService"], _Services_BillService__WEBPACK_IMPORTED_MODULE_12__["BillService"], _Services_HubService__WEBPACK_IMPORTED_MODULE_14__["HubConnectionService"]],
         })
     ], RoutingModuleModule);
     return RoutingModuleModule;

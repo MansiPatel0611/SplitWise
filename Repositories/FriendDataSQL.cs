@@ -21,7 +21,32 @@ namespace FinalSplitWise.Repositories
             _Logger = loggerFactory.CreateLogger("FriendsRepository");
         }
 
-        public async Task<Friend> AddNewFriendAsync(string name, string email, int userid)
+    public async Task<Friend> AddFriendAsync(int userid, int friendid)
+    {
+      Friend friend = new Friend();
+
+        var frdexist = _Context.friends.SingleOrDefault(
+        c => (c.userId == userid && c.friendId == friendid)
+        || (c.userId == friendid && c.friendId == userid));
+      if (frdexist == null)
+      {
+        friend.friendId = friendid;
+        friend.userId = userid;
+
+        _Context.friends.Add(friend);
+        try
+        {
+          await _Context.SaveChangesAsync();
+        }
+        catch (Exception exp)
+        {
+          _Logger.LogError($"Error in {nameof(AddFriendAsync)}: " + exp.Message);
+        }
+      }
+      return friend;
+    }
+
+    public async Task<Friend> AddNewFriendAsync(string name, string email, int userid)
         {
             Friend friend = new Friend();
 
@@ -89,10 +114,32 @@ namespace FinalSplitWise.Repositories
 
         public async Task<bool> RemoveFriendAsync(int userid, int friendid )
         {
-            var frd = await _Context.friends.SingleOrDefaultAsync(
-                c => (c.userId == userid && c.friendId==friendid)
-                ||(c.userId == friendid && c.friendId == userid));
-            _Context.friends.Remove(frd);
+
+      var data = _Context.settlements.Where(c => (c.payerId == userid && c.payeeId == friendid )||(c.payerId==friendid && c.payeeId==userid)).ToList();
+     
+
+      if (data.Count != 0)
+      {
+        var isdelete = data.Find(c => c.amount == 0);
+        if (isdelete != null)
+        {
+          var frd = await _Context.friends.SingleOrDefaultAsync(
+               c => (c.userId == userid && c.friendId == friendid)
+               || (c.userId == friendid && c.friendId == userid));
+          _Context.friends.Remove(frd);
+          _Context.settlements.Remove(isdelete);
+        }
+      }
+     
+      else
+      {
+        var frd = await _Context.friends.SingleOrDefaultAsync(
+               c => (c.userId == userid && c.friendId == friendid)
+               || (c.userId == friendid && c.friendId == userid));
+        _Context.friends.Remove(frd);
+      }
+
+     
             try
             {
                 return (await _Context.SaveChangesAsync() > 0 ? true : false);

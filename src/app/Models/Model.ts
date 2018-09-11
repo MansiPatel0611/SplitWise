@@ -148,7 +148,12 @@ export class TransactionResponse {
 }
 export class GroupBalance {
   constructor() { }
-  public member: number;
+  public member: Detail;
   public amt: number;
   public status: string;
+}
+export class GroupBalanceDetail {
+  constructor() { }
+  public id: number;
+  public detail: string;
 }

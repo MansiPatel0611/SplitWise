@@ -17,6 +17,10 @@ label.nav-link{
   background-color:whitesmoke;
   color:grey
 }
+.detail{
+  background-color:lightgray;
+  height:50px;
+}
 .modal{
   position:fixed;
   right:100px;
@@ -29,11 +33,21 @@ label.nav-link{
   position:fixed;
   left:700px;
 }
+.payer1{
+  position:fixed;
+  left:200px;
+}
 .modal-content{
   width:300px;
 }
+.design1{
+    align-content:center;
+}
 .design{
-  align-content:center;
+  top:2px;
+  vertical-align:middle;
+  line-height:22px;
+  text-align:center;
 }
 .myscroll.modal-body {
   min-height:initial;

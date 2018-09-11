@@ -75,7 +75,6 @@ namespace FinalSplitWise.Repositories
         groupMember.groupId = group.groupid;
         groupMember.userId = x.userId;
         _Context.groupMembers.Add(groupMember);
-
         try
         {
           await _Context.SaveChangesAsync();
@@ -86,14 +85,76 @@ namespace FinalSplitWise.Repositories
         }
       }
       response = ModelData(group);
+      for(int i = 0; i < group1.groupMembers.Count; i++)
+      {
+        for (int j = i+1; j < group1.groupMembers.Count; j++)
+        {
+          Friend friend = new Friend();
+
+          var frdexist = _Context.friends.SingleOrDefault(
+          c => (c.userId == group1.groupMembers[i].userId && c.friendId == group1.groupMembers[j].userId)
+          || (c.userId == group1.groupMembers[j].userId && c.friendId == group1.groupMembers[i].userId));
+          if (frdexist == null)
+          {
+            friend.friendId = group1.groupMembers[j].userId;
+            friend.userId = group1.groupMembers[i].userId;
+
+            _Context.friends.Add(friend);
+            try
+            {
+              await _Context.SaveChangesAsync();
+            }
+            catch (Exception exp)
+            {
+              _Logger.LogError($"Error in {nameof(CreateGroupAsync)}: " + exp.Message);
+            }
+          }
+        }
+
+      }
       return response;
     }
 
     public async Task<bool> DeleteGroupAsync(int id)
     {
-      var user = await _Context.groups
-                    .SingleOrDefaultAsync(c => c.groupid == id);
-      _Context.groups.Remove(user);
+      var data = _Context.settlements.Where(c => ( c.groupId == id)).ToList();
+      if (data.Count != 0)
+      {
+        var isdelete = data.FindAll(c => c.amount == 0);
+        if (isdelete.Count==0)
+        {
+          return (await _Context.SaveChangesAsync() > 0 ? true : false);
+        }
+        else
+        {
+          var bill = _Context.bills.Where(c => c.groupId == id).ToList();
+          for (int i = 0; i < bill.Count; i++)
+          {
+            _Context.bills.Remove(bill[i]);
+            //await _Context.SaveChangesAsync();
+          }
+          for (int i = 0; i < isdelete.Count; i++)
+          {
+            _Context.settlements.Remove(isdelete[i]);
+            //await _Context.SaveChangesAsync();
+          }
+          var trans = _Context.transactions.Where(c => c.groupId == id).ToList();
+          for(int i = 0; i < trans.Count; i++)
+          {
+            _Context.transactions.Remove(trans[i]);
+            //await _Context.SaveChangesAsync();
+          }
+          var user = await _Context.groups
+                     .SingleOrDefaultAsync(c => c.groupid == id);
+          _Context.groups.Remove(user);
+        }
+      }
+      else
+      {
+        var user = await _Context.groups
+                      .SingleOrDefaultAsync(c => c.groupid == id);
+        _Context.groups.Remove(user);
+      }
       try
       {
         return (await _Context.SaveChangesAsync() > 0 ? true : false);
@@ -155,11 +216,14 @@ namespace FinalSplitWise.Repositories
          .Where(c => c.gm_group_id.Any(gs => (gs.userId == userid)) &&
          c.gm_group_id.Any(gs => (gs.userId == friendid))).ToListAsync();
 
-      for (var j = 0; j < group.Count; j++)
+      if (group.Count != 0)
       {
-        var GroupResponse = new GroupResponse();
-        GroupResponse = ModelData(group[j]);
-        groups.Add(GroupResponse);
+        for (var j = 0; j < group.Count; j++)
+        {
+          var GroupResponse = new GroupResponse();
+          GroupResponse = ModelData(group[j]);
+          groups.Add(GroupResponse);
+        }
       }
       return groups;
     }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FriendService } from '../Services/FriendService';
-import { FriendResponse, CommonResponse, User, BillResponse, PayerResponse, SharedWithResponse, SettlementResponse, BillGetResponse, GetSettlementResponse, CreateGroupResponse, TransactionResponse } from '../Models/Model';
+import { FriendResponse, CommonResponse, User, BillResponse, PayerResponse, SharedWithResponse, SettlementResponse, BillGetResponse, GetSettlementResponse, CreateGroupResponse, TransactionResponse, GroupBalanceDetail, GroupResponse, TransactionGetResponse } from '../Models/Model';
 import { UserService } from '../Services/UserService';
 import { BillService } from '../Services/BillService';
 import { GroupService } from '../Services/GroupService';
@@ -21,13 +21,6 @@ export class FriendBoardComponent implements OnInit {
   paidby: any;
   bills: BillGetResponse[];
 
-
-
- 
-
-
-
-
   public addBill = new BillResponse();
 
   public payer = new PayerResponse();
@@ -39,12 +32,21 @@ export class FriendBoardComponent implements OnInit {
   public settlement = new SettlementResponse();
   settlements = new Array<SettlementResponse>();
 
+  frdSettlement: GetSettlementResponse[];
+  balance: number = 0;
+  showBalance: number;
+
+  details = new Array<GroupBalanceDetail>();
+  detail = new GroupBalanceDetail();
+
   friendPay: number;
   userPay: number;
   my_date: any;
 
   public friend = new FriendResponse();
   public user = new User();
+
+  transactions: TransactionGetResponse[];
 
 
   ngOnInit() {
@@ -56,7 +58,7 @@ export class FriendBoardComponent implements OnInit {
       this.userid = params['id']
     });
     this.friend_service.getFriendData(this.id).subscribe((data: FriendResponse) => {
-      console.log(data),
+    //  console.log(data),
         this.friend = data
     });
 
@@ -64,11 +66,58 @@ export class FriendBoardComponent implements OnInit {
       .subscribe((data: User) => this.user = data);
 
     this.bill_service.getFriendBills(this.userid, this.id).subscribe((data: BillGetResponse[]) => {
-      this.bills = data,
-        console.log(this.bills)
+      this.bills = data
+        //this.bills = this.bills.sort((a) => (a as any));
+      //  console.log(this.bills)
     });
 
-   
+    this.bill_service.getFriendTransactions(this.userid, this.id)
+      .subscribe((data: TransactionGetResponse[]) => {
+        this.transactions = data,
+          console.log(this.transactions);
+      });
+
+    this.bill_service.getFriendSettlements(this.userid, this.id)
+      .subscribe((data: GetSettlementResponse[]) => {
+        this.frdSettlement = data,
+          console.log(this.frdSettlement);
+        for (var i = 0; i < this.frdSettlement.length; i++) {
+
+          if (this.userid == this.frdSettlement[i].payer.id) {
+            this.detail = new GroupBalanceDetail();
+            this.detail.detail = "You owe " + this.frdSettlement[i].payee.name + " ₹" + this.frdSettlement[i].amount;
+            if (this.frdSettlement[i].group == null) {
+              this.detail.detail = this.detail.detail + " for " + "'" + "Non Group Expense" + "'";
+            }
+            else {
+              this.detail.detail = this.detail.detail + " for " + "'" + this.frdSettlement[i].group.name + "'";
+            }
+            this.detail.id = 0;
+            this.details.push(this.detail);
+            this.balance = this.balance - this.frdSettlement[i].amount;
+
+          }
+          if (this.userid == this.frdSettlement[i].payee.id) {
+            this.detail = new GroupBalanceDetail();
+            this.detail.detail = this.frdSettlement[i].payer.name + " owes you ₹" + this.frdSettlement[i].amount;
+            if (this.frdSettlement[i].group == null) {
+              this.detail.detail = this.detail.detail + " for " + "'" + "Non Group Expense" + "'";
+            }
+            else {
+              this.detail.detail = this.detail.detail + " for " + "'" + this.frdSettlement[i].group.name + "'";
+            }
+            this.detail.id = 1;
+            this.details.push(this.detail);
+            this.balance = this.balance + this.frdSettlement[i].amount;
+          }
+        }
+        if (this.balance < 0)
+          this.showBalance = 0 - this.balance;
+        else
+        this.showBalance = this.balance;
+        console.log(this.balance);
+        console.log(this.details);
+      });
   }
 
 
@@ -79,14 +128,23 @@ export class FriendBoardComponent implements OnInit {
 
   delete() {
     if (confirm("Are you sure you want to remove this friend")) {
-      this.friend_service.removeFriend(this.userid, this.id)
-        .subscribe((data: CommonResponse) => {
-          console.log(data),
-            this.router.navigate(['/Board', this.userid])
-        },
-        error => alert("cannot delete friend"));
+      this.group_service.getFriendGroups(this.userid, this.id)
+        .subscribe((data: GroupResponse[]) => {
+          if (data.length > 0) {
+            alert("you this friend in group. so you cannot remove friend");
+          }
+          else {
+            this.friend_service.removeFriend(this.userid, this.id)
+              .subscribe((data: CommonResponse) => {
+                console.log(data),
+                  this.router.navigate(['/Board', this.userid])
+              },
+                error => alert("cannot delete friend"));
+          }
+        }); 
+        }
+      
     }
-  }
   showpayer() {
     this.paidby = "multiple"
     if (this.showPayer == false)
@@ -138,7 +196,8 @@ export class FriendBoardComponent implements OnInit {
     }
    
 
-    var div = this.addBill.total_amount / 2;
+    var div = Number.parseFloat((this.addBill.total_amount / 2).toFixed(2));
+  // div = Math.round(div);
 
     this.shareMember = new SharedWithResponse();
     this.shareMember.owes_amount = div;
@@ -190,7 +249,7 @@ export class FriendBoardComponent implements OnInit {
     this.addBill.sharedwiths = this.shareMembers;
     this.addBill.settlements = this.settlements;
     console.log(this.addBill);
-    //this.bill_service.addNewBill(this.addBill)
-    //  .subscribe(data => console.log(data));
+    this.bill_service.addNewBill(this.addBill)
+      .subscribe(data => console.log(data));
   }
 }

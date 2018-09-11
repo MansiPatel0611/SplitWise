@@ -214,7 +214,7 @@ namespace FinalSplitWise.Repositories
             var bills = _Context.bills.Where(
                 c=>c.bill_created_byId==userid || c.bill_payer.Any(
                     x=>x.paid_byId==userid) || c.bill_shared_with.Any(
-                        x=>x.shared_withId==userid)).ToList();
+                        x=>x.shared_withId==userid)).OrderByDescending(c => c.bill_created_at).ToList();
 
             for (var j = 0; j < bills.Count; j++)
             {
@@ -356,8 +356,7 @@ namespace FinalSplitWise.Repositories
 
             var bills = _Context.bills.Where(c =>
             c.bill_shared_with.Any(y=>y.shared_withId==userid) &&
-            c.bill_shared_with.Any(y => y.shared_withId == friendid)).ToList();
-
+            c.bill_shared_with.Any(y => y.shared_withId == friendid)).OrderByDescending(c=>c.bill_created_at).ToList();
             for (var j = 0; j < bills.Count; j++)
             {
                 BillGetResponse bill = new BillGetResponse();
@@ -428,7 +427,8 @@ namespace FinalSplitWise.Repositories
         public async Task<List<BillGetResponse>> GetGroupBillsAsync(int groupid)
         {
             var billlist = new List<BillGetResponse>();
-            var bills= _Context.bills.Where(c=>c.groupId==groupid).ToList();
+            var bills= _Context.bills.Where(c=>c.groupId==groupid)
+        .OrderByDescending(c => c.bill_created_at).ToList();
             for (var j = 0; j < bills.Count; j++)
             {
                 BillGetResponse bill = new BillGetResponse();

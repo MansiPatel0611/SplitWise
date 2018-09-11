@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GroupService } from '../Services/GroupService';
-import { GroupResponse, FriendResponse, Group, BillResponse, PayerResponse, SharedWithResponse, Bill, SettlementResponse, settle, User, BillGetResponse, GetSettlementResponse, GroupBalance } from '../Models/Model';
+import { GroupResponse, FriendResponse, Group, BillResponse, PayerResponse, SharedWithResponse, Bill, SettlementResponse, settle, User, BillGetResponse, GetSettlementResponse, GroupBalance, GroupBalanceDetail, Detail, TransactionGetResponse } from '../Models/Model';
 import { UserService } from '../Services/UserService';
 import { BillService } from '../Services/BillService';
-import { concat } from 'rxjs';
+import { HubConnectionService } from '../Services/HubService';
 
 @Component({
   selector: 'app-group-board',
@@ -15,6 +15,7 @@ export class GroupBoardComponent implements OnInit {
   public group = new GroupResponse();
   public newGroup = new Group();
   friends: FriendResponse[];
+  nonGroupFriends:FriendResponse[];
   public addBill = new BillResponse();
 
   bills: BillGetResponse[];
@@ -30,6 +31,11 @@ export class GroupBoardComponent implements OnInit {
   GroupSettlements: GetSettlementResponse[];
   groupBalance = new Array<GroupBalance>();
   balance = new GroupBalance();
+  info = new Detail();
+
+  details = new Array<GroupBalanceDetail>();
+  detail = new GroupBalanceDetail();
+
   paidby: any;
   public sett = new settle();
   //setts = new Array<settle>();
@@ -47,9 +53,14 @@ export class GroupBoardComponent implements OnInit {
   isDepth: boolean;
   amount: any = "";
 
+  showSettings: boolean= false;
+  showBalance: boolean = true;
+
   showbill: boolean = false;
 
-  constructor(private route: ActivatedRoute, private router: Router,
+  transactions: TransactionGetResponse[];
+
+  constructor(private route: ActivatedRoute, private router: Router, private service: HubConnectionService,
     private bill_service: BillService, private group_service: GroupService, private user_service: UserService) { }
 
   ngOnInit() {
@@ -63,8 +74,11 @@ export class GroupBoardComponent implements OnInit {
     this.paidby = "Select Payer";
     this.group_service.GetGroupInfo(this.id).subscribe(
       (data: any) => {
-        console.log(data),
+      //  console.log(data),
           this.group = data;
+
+
+
         if (this.group.is_simplified_depts == true) {
           this.status = true;
           this.isDepth = this.status;
@@ -73,24 +87,56 @@ export class GroupBoardComponent implements OnInit {
         this.bill_service.getGroupSettlement(this.userid, this.id)
           .subscribe((data: GetSettlementResponse[]) => {
             this.GroupSettlements = data,
-              console.log(this.GroupSettlements);
+            //  console.log(this.GroupSettlements);
+
+            this.user_service.getFriends(this.userid).subscribe
+              ((data: FriendResponse[]) => {
+                this.friends = data,
+                  this.nonGroupFriends = data;
 
             for (var i = 0; i < this.group.memberLists.length; i++) {
+
+              var place = this.nonGroupFriends.findIndex(c => c.userid == this.group.memberLists[i].id);
+             // console.log(place);
+              if (place >=0 ) {
+                this.nonGroupFriends.splice(place, 1);
+              }
+
               this.balance = new GroupBalance();
-              this.balance.member = this.group.memberLists[i].id;
+              this.info = new Detail();
+              this.info.id = this.group.memberLists[i].id;
+              this.info.name = this.group.memberLists[i].name;
+              this.balance.member = this.info;
+
               this.balance.amt = 0;
+
               for (var j = 0; j < this.GroupSettlements.length; j++) {
-                if (this.group.memberLists[i].id == this.GroupSettlements[j].payer.id) {
-                  this.balance.amt = this.balance.amt - this.GroupSettlements[j].amount;
+
+                if (this.GroupSettlements[j].amount != 0) {
+
+                  if (this.group.memberLists[i].id == this.GroupSettlements[j].payer.id) {
+                    this.detail = new GroupBalanceDetail();
+                    this.detail.id = this.group.memberLists[i].id;
+                    this.detail.detail = this.group.memberLists[i].name + " owes ₹" +  this.GroupSettlements[j].amount
+                      + " to " + this.GroupSettlements[j].payee.name;
+                    this.details.push(this.detail);
+                    this.balance.amt = this.balance.amt - this.GroupSettlements[j].amount;
+
+                  }
+                  if (this.group.memberLists[i].id == this.GroupSettlements[j].payee.id) {
+                    this.detail = new GroupBalanceDetail();
+                    this.detail.id = this.group.memberLists[i].id;
+                    this.detail.detail = this.group.memberLists[i].name + " owes " + this.GroupSettlements[j].payer.name + " ₹" + this.GroupSettlements[j].amount;
+                    this.details.push(this.detail);
+                    this.balance.amt = this.balance.amt + this.GroupSettlements[j].amount;
+                  }
                 }
-                 if (this.group.memberLists[i].id == this.GroupSettlements[j].payee.id) {
-                  this.balance.amt = this.balance.amt + this.GroupSettlements[j].amount;
-                }
+
+               
               }
               if (this.balance.amt == 0)
                 this.balance.status = "settled";
-              else if (this.balance.amt < 0)
-                {
+              else if (this.balance.amt < 0) {
                 this.balance.amt = 0 - this.balance.amt;
                 this.balance.status = "owes";
 
@@ -100,21 +146,22 @@ export class GroupBoardComponent implements OnInit {
               this.groupBalance.push(this.balance);
 
             }
-            console.log(this.groupBalance);
-
+          //  console.log(this.groupBalance);
+              // console.log(this.details);
+              console.log(this.nonGroupFriends);
           });
 
       });
-    this.user_service.getFriends(this.userid).subscribe
-      ((data: FriendResponse[]) => {
-        this.friends = data
       });
 
+
     this.bill_service.getGroupBills(this.id).subscribe((data: BillGetResponse[]) => {
-      this.bills = data
-     //   console.log(this.bills)
+      this.bills = data,
+        console.log(this.bills)
     });
 
+    this.bill_service.getGroupTransactions(this.id)
+      .subscribe((data: TransactionGetResponse[]) => this.transactions = data);
    
   }
 
@@ -130,11 +177,16 @@ export class GroupBoardComponent implements OnInit {
 
   add(userid: number) {
     this.group_service.addGroupMember(userid, this.id).subscribe
-      (data => console.log(data));
+      (
+      data => {
+        console.log(data),
+          this.service.update();
+      });
   }
   remove(userid: number) {
     this.group_service.removeGroupMember(userid, this.id).subscribe
-      (data => console.log(data));
+      (data => { console.log(data), this.service.update() },
+      error => alert("member have pending settlements in group"));
   }
 
   showList() {
@@ -160,17 +212,23 @@ export class GroupBoardComponent implements OnInit {
       this.showbill = false;
   }
 
-  show() {
-    if (this.showvarible == false)
-      this.showvarible = true;
-    else
-      this.showvarible = false;
+  ShowSetting() {
+    this.showSettings = true;
+    this.showBalance = false;
+  }
+  ShowBalance() {
+    this.showBalance = true;
+    this.showSettings = false;
   }
 
   delete() {
     if (confirm("Are you sure you want to delete this group")) {
-      this.group_service.deleteGroup(this.id).subscribe(data => console.log(data));
-      this.router.navigate(['/Board', this.userid])
+      this.group_service.deleteGroup(this.id)
+        .subscribe((data: boolean) => {
+          console.log(data),
+            this.router.navigate(['/Board', this.userid])
+            },
+        error => alert("settlemets still exist"));
     }
    
   }
@@ -214,7 +272,8 @@ export class GroupBoardComponent implements OnInit {
     if (this.payers.length == 0) {
       this.payers.push(this.payer);
     }
-    var div = this.addBill.total_amount / this.group.memberLists.length;
+    var div = Number.parseFloat((this.addBill.total_amount / this.group.memberLists.length).toFixed(2));
+   // div = Math.round(div);
     for (var i = 0; i < this.group.memberLists.length; i++) {
       this.shareMember = new SharedWithResponse();
       this.shareMember.owes_amount = div;

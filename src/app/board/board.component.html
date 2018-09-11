@@ -1,19 +1,20 @@
 <div style="height:auto">
 
-  <button style="position:absolute;top:20px;left:1200px" [routerLink]="['/home']" class="btn btn-info">logout</button>
-  <button class="btn btn-secondary" style="color:white;position:absolute;top:20px;left:1270px" [routerLink]="['account/setting']">
+  <button style="position:absolute;top:25px;left:1000px;width:100px" [routerLink]="['/home']" class="btn btn-info">logout</button>
+  <button class="btn btn-secondary" style="color:white;position:absolute;top:25px;left:1111px;width:100px" [routerLink]="['account/setting']">
     {{user.user_name}}
     <span class="glyphicon glyphicon-lg glyphicon-cog"></span>
   </button>
-  <div class="col-lg-2 border-right border-dark">
-    <nav style=" width:200px" class="navbar flex-column">
+
+  <div class="col-lg-2 border-right border-dark" style="height:550px;overflow-y:scroll">
+    <nav style=" width:190px" class="navbar flex-column">
       <div class="nav flex-column">
         <div class="nav-item">
           <label class="nav-link" [routerLink]="['dashboard']">
             <span class="glyphicon glyphicon-tasks"></span>  Dashboard
           </label>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" [routerLink]="['expense']">
           <label class="nav-link"><span class="glyphicon glyphicon-th-list"></span>  All Expense </label>
         </div>
 
@@ -81,7 +82,7 @@
 
     </nav>
   </div>
-  <div class="col-lg-10">
+  <div class="col-lg-10 myrouter">
     <router-outlet></router-outlet>
   </div>
 </div>

@@ -50,6 +50,11 @@ export class BoardComponent implements OnInit {
           this.Label="hide"
         //  this.router.navigate(['/Board', this.id])
       },
-      error => alert("user does not exist"));
+      error => {
+        alert("user does not exist");
+        this.frd_name = null;
+        this.frd_email = null;
+
+      });
   }
 }

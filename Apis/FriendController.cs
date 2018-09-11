@@ -61,6 +61,8 @@ namespace FinalSplitWise.Apis
       }
     }
 
+
+
     [Route("api/Friend/addFriend/{userid}/{name}/{email}")]
         [HttpPost("{userid}/{name}/{email}")]
         [ProducesResponseType(typeof(CommonResponse), 200)]
@@ -82,7 +84,33 @@ namespace FinalSplitWise.Apis
                 return BadRequest(new CommonResponse { Status = false });
             }
         }
-        [Route("api/Friend/removeFriend/{userid}/{friendid}")]
+
+
+    [Route("api/Friend/addNewFriend/{userid}/{friendid}")]
+    [HttpPost("{userid}/{friendid}")]
+    [ProducesResponseType(typeof(CommonResponse), 200)]
+    [ProducesResponseType(typeof(CommonResponse), 400)]
+    public async Task<ActionResult> AddNewFriend(int userid, int friendid)
+    {
+      try
+      {
+        var friend = await _frienddata.AddFriendAsync(userid,friendid);
+        if (friend == null || friend.id == 0)
+        {
+          return BadRequest(new CommonResponse { Status = false });
+        }
+        return Ok(new CommonResponse { Status = true });
+      }
+      catch (Exception exp)
+      {
+        _Logger.LogError(exp.Message);
+        return BadRequest(new CommonResponse { Status = false });
+      }
+    }
+
+
+
+    [Route("api/Friend/removeFriend/{userid}/{friendid}")]
         [HttpDelete("{userid}/{friendid}")]
         [ProducesResponseType(typeof(CommonResponse), 200)]
         [ProducesResponseType(typeof(CommonResponse), 400)]

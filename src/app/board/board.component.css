@@ -18,3 +18,9 @@ label.list{
 .form-control{
   width:auto;
 }
+.myrouter{
+  min-height:initial;
+  max-height:500px;
+  overflow-y:scroll;
+}
+

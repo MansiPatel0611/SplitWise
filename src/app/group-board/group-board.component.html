@@ -1,9 +1,9 @@
-<div class="row1">
+<div class="row full">
 
   <div class="col-lg-8 border-right border-dark">
     <div class="navbar navbar-expand-sm">
       <h3>{{ group.group_name }}</h3>
-      <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#GroupBillModal" style="position:absolute;left:500px">Add Bill</button>
+      <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#GroupBillModal" style="position:absolute;left:600px">Add Bill</button>
 
       <div class="modal fade" id="GroupBillModal" role="dialog">
         <div class="modal-dialog">
@@ -39,7 +39,7 @@
                 </div>
 
                 <div>
-                  Paid By 
+                  Paid By
                   <a style="background-color:lightgray;border-radius:5px;font-weight:bold;min-height:10px" data-toggle="modal" data-target="#GroupBillPayer">{{ paidby }}</a>
                 </div>
                 <div>
@@ -84,196 +84,364 @@
         </div>
       </div>
 
-      <button type="button" class="btn btn-danger btn-lg" style="position:absolute;left:600px">Settle Up</button>
     </div>
+
+    <div class="billNav">
+      <!--<div class="panel-group">-->
+      <div class="panel panel-default">
+        <div class="panel-heading">
+         
+          <div class="row">
+            <div class="col-lg-11">
+              <label class="panel-title" style="color:grey">
+                <a data-toggle="collapse" href="#set">Settlements</a>
+              </label>
+            </div>
+
+          </div>
+
+
+        </div>
+        <div id="set" class="panel-collapse collapse">
+          <div class="panel-body">
+
+            <div class="billNav" *ngFor="let settle of transactions">
+              <!--<div class="panel-group">-->
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <!--<div class="date"> "Aug"
+                <div class="number">31</div>
+                </div>-->
+                  <div class="row">
+                    <div class="col-lg-1 design1">
+                      {{ settle.paid_on | date:'MMM'}}
+                      <div class="design">
+                        {{ settle.paid_on | date:'dd'}}
+                      </div>
+                    </div>
+                    <div class="col-lg-11">
+                      <label class="panel-title" style="font-weight:normal">
+                        {{settle.payerId.name }} paid {{settle.payeeId.name}} &#8377;{{settle.paid_amount}}
+                      </label>
+                    </div>
+
+                  </div>
+
+
+                </div>
+                <!--<div id="" class="panel-collapse collapse">
+                <div class="panel-body border-bottom">
+                  <br />
+                 fjklf
+                </div>
+
+              </div>-->
+                <!--</div>-->
+              </div>
+            </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <div class="billNav" *ngFor="let bill of bills">
       <!--<div class="panel-group">-->
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <!--<div class="date"> "Aug"
-              <div class="number">31</div>
-              </div>-->
-            
-              <a data-toggle="collapse" href="#{{bill.billid}}">{{bill.description}}</a>
-            </h4>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <!--<div class="date"> "Aug"
+        <div class="number">31</div>
+        </div>-->
+          <div class="row">
+            <div class="col-lg-1 design">
+              {{ bill.bill_created_at | date:'MMM'}}
+              <div class="design">
+                {{ bill.bill_created_at | date:'dd'}}
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <label class="panel-title" style="color:grey">
+                <a data-toggle="collapse" href="#{{bill.billid}}">{{bill.description}}</a>
+              </label>
+            </div>
+            <!--<div class="col-lg-5">
+              <div class="col-lg-6 design">
+                <label style="font-size:smaller;font-weight:normal">
+                  {{bill.payers.length | number}} people  Paid
+                </label>   
+                <div class="design">
+                  {{bill.total_amount}}
+                </div>
+              </div>
+              <div class="col-lg-6 design">
+                lent
+                <div class="design">
+                  0000
+                </div>
+              </div>
+            </div>-->
           </div>
-          <div id="{{bill.billid}}" class="panel-collapse collapse">
-            <div class="panel-body">
-            {{bill.description}}
-            added by {{ bill.bill_created_by.name}}
-            on {{bill.bill_created_at}}</div>
-            <div class="panel-footer">{{bill}}</div>
 
+
+        </div>
+        <div id="{{bill.billid}}" class="panel-collapse collapse">
+          <div class="panel-body border-bottom">
+            {{bill.description}}
+            <br />
+            <h4> &#8377;{{bill.total_amount}}</h4>
+            Added by {{ bill.bill_created_by.name}}
+            on {{bill.bill_created_at | date:'MMMM'}} {{bill.bill_created_at | date:'dd'}},{{bill.bill_created_at | date:'yyyy'}}
           </div>
+          <div class="panel-body">
+            <div *ngFor="let member of bill.sharedwiths">
+              {{member.name}}
+              <label style="font-weight:normal" *ngFor="let memberP of bill.payers">
+                <label style="font-weight:normal" *ngIf="member.id==memberP.id">
+                  paid &#8377;{{ memberP.amount}} and &nbsp;
+                </label>
+              </label>
+              <label style="font-weight:normal">
+                owes &#8377;{{member.amount}}
+              </label>
+            </div>
+          </div>
+        </div>
         <!--</div>-->
       </div>
     </div>
-   
+
 
 
   </div>
 
   <div class="col-lg-4">
-    <button type="button" class="btn" style="background-color:powderblue"
-            data-toggle="modal" data-target="#GroupSettingModal">
+    <button type="button" class="btn" style="background-color:powderblue" (click)="ShowBalance()">
+      <span class="glyphicon glyphicon-list-alt"></span>
+    </button>
+
+    <button type="button" class="btn" style="background-color:powderblue;position:relative;left:10px" (click)="ShowSetting()">
       Group Settings
     </button>
 
-    <!--(click)="show()"-->
-
-    <div class="modal fade" id="GroupSettingModal" role="dialog">
-      <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"> {{ group.group_name }} Setting</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <div class="modal-body myscroll">
-
-            <div>
-                <form class="form-horizontal" (ngSubmit)="onSubmit()">
 
 
-                  <label for="group_name">Group name</label>
-                  <input type="text" class="form-control" name="group_name" [(ngModel)]="group.group_name" /><br />
-                  <label>Group Members</label>
-                  <br />
-                  <table class="table">
-                    <tbody *ngFor="let member of group.memberLists">
-                      <tr>
-                        <td>
-                          {{ member.name }}
-                        </td>
-                        <td>
-                          <span class="glyphicon glyphicon-remove-circle" (click)="remove(member.id)" style="color:red"></span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
 
-                  <label>Simplfy Group Depts</label>
-                  <label class="switch">
-                    <input type="checkbox" id="depth" name="depth" (change)="toggleEditable($event)" checked="{{status}}">
-                    <span class="slider round"></span>
-                  </label>
-                  <br /><br />
-                  <button type="button" class="btn" (click)="showList()">Add new member</button>
-                  <br />
-                  <div *ngIf="showlist">
-                    <table class="table">
-                      <tbody *ngFor="let member of friends">
-                        <tr>
-                          <td>
-                            {{ member.user_name }}
-                          </td>
-                          <td>
-                            <span class="glyphicon glyphicon-ok-circle" style="color:green" (click)="add(member.userid)"></span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <br />
-                  <div>
-                    <button type="button" class="btn btn-danger" (click)="delete()">Delete</button>
-                    <button type="submit" class="btn btn-success" style="position:relative; left:10px">Save</button>
-                    <button type="button" class="btn btn-warning" style="position:relative;left:20px" (click)="show()">Cancel</button>
-                  </div>
-                </form>
+    <!--<div class="modal fade" id="GroupSettingModal" role="dialog">
+    <div class="modal-dialog">
+
+       Modal content
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title"> {{ group.group_name }} Setting</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body myscroll">
+
+          <div>
+            <form class="form-horizontal" (ngSubmit)="onSubmit()">
+
+
+              <label for="group_name">Group name</label>
+              <input type="text" class="form-control" name="group_name" [(ngModel)]="group.group_name" /><br />
+              <label>Group Members</label>
+              <br />
+              <table class="table">
+                <tbody *ngFor="let member of group.memberLists">
+                  <tr>
+                    <td>
+                      {{ member.name }}
+                    </td>
+                    <td>
+                      <span class="glyphicon glyphicon-remove-circle" (click)="remove(member.id)" style="color:red"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <label>Simplfy Group Depts</label>
+              <label class="switch">
+                <input type="checkbox" id="depth" name="depth" (change)="toggleEditable($event)" checked="{{status}}">
+                <span class="slider round"></span>
+              </label>
+              <br /><br />
+              <button type="button" class="btn" (click)="showList()">Add new member</button>
+              <br />
+              <div *ngIf="showlist">
+                <table class="table">
+                  <tbody *ngFor="let member of friends">
+                    <tr>
+                      <td>
+                        {{ member.user_name }}
+                      </td>
+                      <td>
+                        <span class="glyphicon glyphicon-ok-circle" style="color:green" (click)="add(member.userid)"></span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
+              <br />
+              <div>
+                <button type="button" class="btn btn-danger" (click)="delete()" data-dismiss="modal">Delete</button>
+                <button type="submit" class="btn btn-success" style="position:relative; left:10px" data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-warning" style="position:relative;left:20px" data-dismiss="modal">Cancel</button>
+              </div>
+            </form>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>-->
+
+
+    <br /><br />
+
+    <div *ngIf="showSettings">
+      <h4>Group Settings</h4>
+      <div>
+        <form class="form-horizontal" (ngSubmit)="onSubmit()">
+
+
+          <label for="group_name">Group name</label>
+          <input type="text" class="form-control" name="group_name" [(ngModel)]="group.group_name" /><br />
+          <label>Group Members</label>
+          <br />
+          <table class="table">
+            <tbody *ngFor="let member of group.memberLists">
+              <tr>
+                <td>
+                  {{ member.name }}
+                </td>
+                <td>
+                  <span class="glyphicon glyphicon-remove-circle" (click)="remove(member.id)" style="color:red"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <label>Simplfy Group Depts</label>
+          <label class="switch">
+            <input type="checkbox" id="depth" name="depth" (change)="toggleEditable($event)" checked="{{status}}">
+            <span class="slider round"></span>
+          </label>
+          <br /><br />
+          <button type="button" class="btn" (click)="showList()">Add new member</button>
+          <br />
+          <br />
+          <div *ngIf="showlist">
+            <table class="table">
+              <tbody *ngFor="let member of nonGroupFriends">
+                <tr>
+                  <td>
+                    {{ member.user_name }}
+                  </td>
+                  <td>
+                    <span class="glyphicon glyphicon-ok-circle" style="color:green" (click)="add(member.userid)"></span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <br />
+          <div>
+            <button type="button" class="btn btn-danger" (click)="delete()">Delete</button>
+            <button type="submit" class="btn btn-success" style="position:relative; left:10px">Save</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+
+    <div *ngIf="showBalance">
+      <h4>
+        Group Balance
+      </h4>
+      <div *ngFor="let member of group.memberLists">
+        <label style="color:gray;font-size:medium">
+          <span class="glyphicon glyphicon-user" style="color:grey"></span>
+          {{ member.name }}
+        </label>
+        <br />
+        <div *ngFor="let balance of groupBalance">
+          <div *ngIf="member.id==balance.member.id">
+            <label *ngIf="balance.status=='gets'" style="color:green;font-weight:normal">
+              {{ balance.status }}
+              &#8377;{{balance.amt}}
+            </label>
+            <label *ngIf="balance.status=='owes'" style="color:red;font-weight:normal">
+              {{ balance.status }}
+              &#8377;{{balance.amt}}
+            </label>
+            <label *ngIf="balance.status=='settled'" style="color:gray;font-weight:normal">
+              {{ balance.status }}
+            </label>
+          </div>
+        </div>
+      </div>
+      <a data-toggle="modal" data-target="#GroupSettlementDetail">
+        Detail
+      </a>
+    </div>
+    <div>
+
+
+
+      <div class="modal fade" id="GroupSettlementDetail" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content balance">
+            <div class="modal-header">
+              <h4 class="modal-title">Group Balances</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body myscroll">
+              <div class="row nav-link" *ngFor="let member of group.memberLists">
+                <div class="col-lg-4 nav-item">
+                  <label style="color:gray;font-size:medium">
+                    <span class="glyphicon glyphicon-user" style="color:grey"></span>
+                    {{ member.name }}
+                  </label>
+                  <br />
+                  <div *ngFor="let balance of groupBalance">
+                    <div *ngIf="member.id==balance.member.id">
+                      <label *ngIf="balance.status=='gets'" style="color:green;font-weight:normal">
+                        {{ balance.status }}
+                        &#8377;{{balance.amt}}
+                      </label>
+                      <label *ngIf="balance.status=='owes'" style="color:red;font-weight:normal">
+                        {{ balance.status }}
+                        &#8377;{{balance.amt}}
+                      </label>
+                      <label *ngIf="balance.status=='settled'" style="color:gray;font-weight:normal">
+                       {{ balance.status }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-8 nav-item">
+                  <div *ngFor="let detail of details">
+                    <ul *ngIf="detail.id==member.id">
+                      <li style="color:grey">{{ detail.detail }}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn" data-dismiss="modal">Close</button>
+            </div>
           </div>
         </div>
       </div>
 
-            <button type="button" class="btn" style="background-color:powderblue;position:relative;left:10px">
-              <span class="glyphicon glyphicon-list-alt"></span>
-            </button>
-            <br /><br />
-            <div>
-              <h4>
-                Group Balance
-              </h4>
-              <div *ngFor="let member of group.memberLists">
-                <label>
-                  <span class="glyphicon glyphicon-user" style="color:grey"></span>
-                  {{ member.name }}
-                </label>
-                <br />
-                <div *ngFor="let balance of groupBalance">
-                  <div *ngIf="member.id==balance.member">
-                    <label *ngIf="balance.status=='gets'" style="color:green">
-                      {{ balance.status }}
-                      {{balance.amt}}
-                    </label>
-                    <label *ngIf="balance.status=='owes'" style="color:red">
-                      {{ balance.status }}
-                      {{balance.amt}}
-                    </label>
-                    <label *ngIf="balance.status=='settled'" style="color:gray">
-                      {{ balance.status }}
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <a data-toggle="modal" data-target="#GroupSettlementDetail">
-                Detail
-              </a>
+
+    </div>
 
 
-              <div class="modal fade" id="GroupSettlementDetail" role="dialog">
-                <div class="modal-dialog">
-
-                  <!-- Modal content-->
-                  <div class="modal-content balance">
-                    <div class="modal-header">
-                      <h4 class="modal-title">Group Balances</h4>
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                     <div class="row" *ngFor="let member of group.memberLists">
-                       <div class="col-lg-4">
-                         <label>
-                           <span class="glyphicon glyphicon-user" style="color:grey"></span>
-                           {{ member.name }}
-                         </label>
-                         <br />
-                         <div *ngFor="let balance of groupBalance">
-                           <div *ngIf="member.id==balance.member">
-                             <label *ngIf="balance.status=='gets'" style="color:green">
-                               {{ balance.status }}
-                               {{balance.amt}}
-                             </label>
-                             <label *ngIf="balance.status=='owes'" style="color:red">
-                               {{ balance.status }}
-                               {{balance.amt}}
-                             </label>
-                             <label *ngIf="balance.status=='settled'" style="color:gray">
-                               {{ balance.status }}
-                             </label>
-                           </div>
-                         </div>
-                       </div>
-                       <div class="col-lg-8">
-                         <div>
-                          show details
-                         </div>
-                       </div>
-                     </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-
-            </div>
-
-          
-          </div>
+  </div>
         </div>

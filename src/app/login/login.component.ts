@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
       },
         error => {
           alert("Incorrect check id or password")
+          this.user = new User();
         }
       );
   }

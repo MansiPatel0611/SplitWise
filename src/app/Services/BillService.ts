@@ -10,6 +10,9 @@ export class BillService {
   addNewBill(bill: BillResponse) {
     return this.http.post("api/Bill/addBill", bill);
   }
+  getUserBills(userid: number) {
+    return this.http.get("api/Bill/allbills/" + userid);
+  }
   getGroupBills(id: number) {
     return this.http.get("api/Bill/getGroupBills/" + id);
   }
@@ -26,5 +29,17 @@ export class BillService {
 
   getGroupSettlement(userid: number, groupid: number) {
     return this.http.get("api/GroupSettlements/" + userid + "/" + groupid);
+  }
+  getUserSettlements(userid: number) {
+    return this.http.get("api/userSettlements/" + userid);
+  }
+  getFriendTransactions(userid: number, friendid: number) {
+    return this.http.get("api/frd/expense/" + userid + "/" + friendid);
+  }
+  getGroupTransactions(groupid: number) {
+    return this.http.get("api/group/expense/" + groupid);
+  }
+  getUserExpenseTransaction(userid: number) {
+    return this.http.get("api/all/expense/" + userid);
   }
 }

@@ -1,4 +1,4 @@
-﻿using FinalSplitWise.Data;
+using FinalSplitWise.Data;
 using FinalSplitWise.Models;
 using FinalSplitWise.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +27,7 @@ namespace FinalSplitWise.Repositories
 
             var trans = _Context.transactions
                 .Where(c => (c.payerId == userid || c.payeeId == userid) || c.group.gm_group_id
-                .Any(x => x.userId == userid)).ToList();
+                .Any(x => x.userId == userid)).OrderByDescending(c=>c.paid_on).ToList();
             for (int i = 0; i < trans.Count; i++)
             {
                 TransactionGetResponse transaction = new TransactionGetResponse();
@@ -65,7 +65,7 @@ namespace FinalSplitWise.Repositories
 
             var trans = _Context.transactions
                 .Where(c => (c.payerId == userid && c.payeeId == friendid)
-                || (c.payerId == friendid && c.payeeId == userid)).ToList();
+                || (c.payerId == friendid && c.payeeId == userid)).OrderByDescending(c => c.paid_on).ToList();
             for(int i=0;i<trans.Count;i++)
             {
                 TransactionGetResponse transaction = new TransactionGetResponse();
@@ -102,7 +102,7 @@ namespace FinalSplitWise.Repositories
             var transactions = new List<TransactionGetResponse>();
 
             var trans = _Context.transactions
-                .Where(c =>c.groupId==groupid).ToList();
+                .Where(c =>c.groupId==groupid).OrderByDescending(c => c.paid_on).ToList();
             for (int i = 0; i < trans.Count; i++)
             {
                 TransactionGetResponse transaction = new TransactionGetResponse();
@@ -239,7 +239,41 @@ namespace FinalSplitWise.Repositories
             return settlements;
         }
 
-        public async Task<bool> SettleUpAsync(TransactionResponse transaction)
+    public async Task<List<GetSettlementResponse>> getUserSettlements(int userid)
+    {
+      var settlements = new List<GetSettlementResponse>();
+      var sett = _Context.settlements.Where(c=>c.payerId==userid||c.payeeId==userid).ToList();
+      for (int i = 0; i < sett.Count; i++)
+      {
+        GetSettlementResponse getSettlement = new GetSettlementResponse();
+        if (sett[i].groupId != null)
+        {
+          var nameid2 = _Context.groups.SingleOrDefault(c => c.groupid == sett[i].groupId);
+          var detail2 = new Detail();
+          detail2.id = nameid2.groupid;
+          detail2.name = nameid2.group_name;
+          getSettlement.group = detail2;
+        }
+
+        var detail1 = new Detail();
+        var nameid1 = _Context.users.SingleOrDefault(c => c.userid == sett[i].payerId);
+        detail1.name = nameid1.user_name;
+        detail1.id = nameid1.userid;
+        getSettlement.payer = detail1;
+
+        var detail = new Detail();
+        var nameid = _Context.users.SingleOrDefault(c => c.userid == sett[i].payeeId);
+        detail.name = nameid.user_name;
+        detail.id = nameid.userid;
+        getSettlement.payee = detail;
+
+        getSettlement.amount = sett[i].amount;
+        settlements.Add(getSettlement);
+      }
+      return settlements;
+    }
+
+    public async Task<bool> SettleUpAsync(TransactionResponse transaction)
         {
             Transaction transactions = new Transaction();
             if(transaction.groupId!=0)

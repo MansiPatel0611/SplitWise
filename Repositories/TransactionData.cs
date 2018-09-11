@@ -1,4 +1,4 @@
-﻿using FinalSplitWise.Models;
+using FinalSplitWise.Models;
 using FinalSplitWise.ResponseModel;
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ namespace FinalSplitWise.Repositories
     {
         Task<bool> SettleUpAsync(TransactionResponse transaction);
         Task<List<GetSettlementResponse>> getSettlements();
+    Task<List<GetSettlementResponse>> getUserSettlements(int userid);
         Task<List<GetSettlementResponse>> getFriendSettlement(int userid, int friendid);
         Task<List<GetSettlementResponse>> getGroupSettlement(int userid, int groupid);
         Task<List<TransactionGetResponse>> GetAllAmongFriend(int userid,int friendid);

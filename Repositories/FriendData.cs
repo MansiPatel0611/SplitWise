@@ -12,6 +12,7 @@ namespace FinalSplitWise.Repositories
         Task<List<FriendResponse>> GetFriendsAsync(int user_id);
         Task<FriendResponse> GetFriendAsync(int friend_id);
         Task<Friend> AddNewFriendAsync(string name, string email,int userid);
-        Task<bool> RemoveFriendAsync(int userid,int friendid);
+    Task<Friend> AddFriendAsync(int userid,int friendid);
+    Task<bool> RemoveFriendAsync(int userid,int friendid);
     }
 }

@@ -15,4 +15,7 @@ export class FriendService {
   removeFriend(userid: number, friendid: number) {
     return this.http.delete("api/Friend/removeFriend/" + userid + "/" + friendid);
   }
+  addFriend(userid: number, friendid: number) {
+    return this.http.post("api/Friend/addNewFriend/", userid + "/" + friendid);
+  }
 }

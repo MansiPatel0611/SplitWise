@@ -1,4 +1,4 @@
-﻿using FinalSplitWise.Data;
+using FinalSplitWise.Data;
 using FinalSplitWise.Models;
 using FinalSplitWise.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -46,9 +46,25 @@ namespace FinalSplitWise.Repositories
 
         public async Task<bool> DeleteGroupMemberAsync(int user, int group)
         {
-            var member = await _Context.groupMembers
-                          .SingleOrDefaultAsync(c=>c.groupId==group && c.userId==user);
-            _Context.groupMembers.Remove(member);
+      var data = _Context.settlements.Where(c =>(c.payerId == user || c.payeeId==user) && c.groupId==group).ToList();
+      if (data.Count!=0)
+      {
+        var isdelete = data.Find(c => c.amount == 0);
+        if(isdelete!=null)
+        {
+          var member = await _Context.groupMembers
+                          .SingleOrDefaultAsync(c => c.groupId == group && c.userId == user);
+          _Context.groupMembers.Remove(member);
+          _Context.settlements.Remove(isdelete);
+        }
+      }
+      else
+      {
+        var member = await _Context.groupMembers
+                          .SingleOrDefaultAsync(c => c.groupId == group && c.userId == user);
+        _Context.groupMembers.Remove(member);
+      }
+            
             try
             {
                 return (await _Context.SaveChangesAsync() > 0 ? true : false);

@@ -1,6 +1,11 @@
-.row1{
+.row.full{
   height:500px;
 }
+/*.billHead{
+  position:relative;
+  left:16px;
+  width:700px;
+}*/
 div.navbar{
   background-color:lightgray;
   color:grey;
@@ -19,11 +24,14 @@ div.billNav{
 label.billNav1.nav-link:hover{
   background-color:lightgray;
 }
-
+.design{
+  vertical-align:middle;
+  text-align:center;
+}
 .form-control{
   width:200px;
 }
-.myscroll.modal-body {
+.myscroll {
   min-height:initial;
   max-height:300px;
   overflow-y:scroll;
@@ -34,6 +42,7 @@ label.nav-link{
   background-color:whitesmoke;
   color:grey
 }
+
 label.nav-link:hover{
   background-color:gray;
   color:black;

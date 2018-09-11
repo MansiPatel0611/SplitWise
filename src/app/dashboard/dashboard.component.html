@@ -20,7 +20,6 @@
                   Share with:
                 </label>
               </div>
-
               <div>
 
                 <label style="font-weight:normal;background-color:whitesmoke"
@@ -68,6 +67,9 @@
             </div>
           </div>
         </div>
+
+        
+
       </div>
 
       <div class="modal fade payer" id="BillfriendListModal" role="dialog">
@@ -101,9 +103,9 @@
             </div>
             <div class="modal-body myscroll">
               <div class="payerlist">
-               
+
                 <label class="nav-link" style="font-weight:normal"
-                      (click)="addSinglePayer(member.id)" *ngFor="let member of billShareWith">
+                       (click)="addSinglePayer(member.id)" *ngFor="let member of billShareWith">
                   {{ member.name }}
                 </label>
                 <label class="nav-link" (click)="showpayer()">
@@ -153,7 +155,7 @@
                   <button class="btn btn-danger" style="width:250px">Pay via Paypal</button>
                 </div>
               </div>
-              <div class="design" *ngIf="showSettle">
+              <div class="design1" *ngIf="showSettle">
                 <div>
                   <span class="glyphicon glyphicon-user" style="font-size:40px;position:relative;left:40px"></span>
                   <span class="glyphicon glyphicon-arrow-right" style="font-size:30px;position:relative;left:60px"></span>
@@ -181,7 +183,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button class="btn btn-success" (click)="addSettlement()">Save</button>
+              <button class="btn btn-success" data-dismiss="modal" (click)="addSettlement()">Save</button>
             </div>
           </div>
         </div>
@@ -235,12 +237,73 @@
 
     </div>
 
+    <div class="detail">
+      <div class="col-lg-4 design border-right">
+        total balance
+        <div *ngIf="total>0" style="color:green">
+          {{total}}
+        </div>
+        <div *ngIf="total<0" style="color:red">
+          {{total}}
+        </div>
+      </div>
+      <div class="col-lg-4 design border-right">
+        you owe
+        <div style="color:red">
+          {{owe}}
+        </div>
+      </div>
+      <div class="col-lg-4 design">
+        you are owed
+        <div style="color:green">
+          {{owed}}
+        </div>
+      </div>
+    </div>
+    <br />
+    <div>
+      <div class="col-lg-6 border-right">
+        <h4 class="border-bottom" style="font-weight:bold;color:gray">
+        YOU OWE</h4>
+        <div *ngFor="let info of details">
+          <div *ngIf="info.amt<0">
+              <h4>
+                {{info.member.name}}
+              </h4>
+              you owe  {{ 0-(info.amt)}}
+              <ul *ngFor="let detail of owedetails" style="color:red">
+                <li *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
+              </ul>
+              <ul *ngFor="let detail of oweddetails" style="color:green">
+                <li *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
+              </ul>
+            </div>
+          </div>
+      </div>
+      <div class="col-lg-6 border-left" style="position:relative;right:1px; height:auto">
+        <h4 class="border-bottom" style="font-weight:bold;text-align:right;color:gray">
+          YOU ARE OWED
+        </h4>
+          <div *ngFor="let info of details">
+            <div *ngIf="info.amt>0">
+              <h4>
+                {{info.member.name}}
+              </h4>
+              owes you {{ info.amt}}
+              <ul *ngFor="let detail of owedetails" style="color:red">
+                <li *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
+              </ul>
+              <ul *ngFor="let detail of oweddetails" style="color:green">
+                <li *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
+              </ul>
+            </div>
+            </div>
+          </div>
+        </div>
 
-   
 
-
+    </div>
+    <div class="col-lg-4">
+      Advertisements
+    </div>
   </div>
-  <div class="col-lg-4">
-    fafadas
-  </div>
-</div>

@@ -11,12 +11,15 @@ import { UserSettingComponent } from './user-setting/user-setting.component';
 import { FriendBoardComponent } from './friend-board/friend-board.component';
 import { FriendService } from './Services/FriendService';
 import { BillService } from './Services/BillService';
+import { ExpenseComponent } from './expense/expense.component';
+import { HubConnectionService } from './Services/HubService';
 
 const appRoutes: Routes = [
   {
   path: 'Board/:id',
   component: BoardComponent,
-  children: [
+    children: [
+      { path: 'expense', component: ExpenseComponent },
     { path: '', component: DashboardComponent },
     { path: 'dashboard', component: DashboardComponent },
     { path: 'group/:gpid', component: GroupBoardComponent },
@@ -40,8 +43,9 @@ const appRoutes: Routes = [
     UserSettingComponent,
     FriendBoardComponent,
     GroupBoardComponent,
+    ExpenseComponent,
     CreateGroupComponent],
-  providers: [GroupService, FriendService,BillService],
+  providers: [GroupService, FriendService, BillService, HubConnectionService],
 
 })
 export class RoutingModuleModule { }

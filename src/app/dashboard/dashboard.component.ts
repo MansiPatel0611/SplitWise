@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FriendResponse, User, GetSettlementResponse, CreateGroupResponse, TransactionResponse, Detail, BillResponse, PayerResponse, SharedWithResponse, SettlementResponse, settle } from '../Models/Model';
+import { FriendResponse, User, GetSettlementResponse, CreateGroupResponse, TransactionResponse, Detail, BillResponse, PayerResponse, SharedWithResponse, SettlementResponse, settle, GroupBalanceDetail, GroupBalance } from '../Models/Model';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../Services/UserService';
 import { GroupService } from '../Services/GroupService';
@@ -28,7 +28,19 @@ export class DashboardComponent implements OnInit {
 
   paidby: any;
 
+
   friendSettlement: GetSettlementResponse[];
+
+  allUserSettlement: GetSettlementResponse[];
+  owe: number=0;
+  owed: number=0;
+  total: number=0;
+  owedetails = new Array<GroupBalanceDetail>();
+  oweddetails = new Array<GroupBalanceDetail>();
+  details = new Array<GroupBalance>();
+  info = new GroupBalance();
+  member = new Detail();
+  detail = new GroupBalanceDetail();
 
   public addBill = new BillResponse();
 
@@ -70,7 +82,82 @@ export class DashboardComponent implements OnInit {
     this.user_service.getFriends(this.id).subscribe
       ((data: FriendResponse[]) => {
         this.friends = data
-        //  console.log(data),
+        for (var i = 0; i < this.friends.length; i++) {
+          this.info = new GroupBalance();
+          this.member = new Detail();
+          this.member.id = this.friends[i].userid;
+          this.member.name = this.friends[i].user_name;
+          this.info.member = this.member;
+          //this.info.member.name = this.friends[i].user_name;
+          this.info.status = "false";
+          this.info.amt = 0;
+          this.details.push(this.info);
+        }
+
+
+        this.bill_service.getUserSettlements(this.id)
+          .subscribe((data: GetSettlementResponse[]) => {
+            this.allUserSettlement = data,
+              console.log(this.allUserSettlement);
+            for (var i = 0; i < this.allUserSettlement.length; i++) {
+
+              if (this.allUserSettlement[i].amount != 0) {
+
+                if (this.id == this.allUserSettlement[i].payer.id) {
+
+                  this.detail = new GroupBalanceDetail();
+                  this.detail.detail = "You owe " + this.allUserSettlement[i].payee.name + " " + this.allUserSettlement[i].amount;
+                  if (this.allUserSettlement[i].group == null) {
+                    this.detail.detail = this.detail.detail + " for " + "'" + "Non Group Expense" + "'";
+                  }
+                  else {
+                    this.detail.detail = this.detail.detail + " for " + "'" + this.allUserSettlement[i].group.name + "'";
+                  }
+                  this.detail.id = this.allUserSettlement[i].payee.id;
+                  this.owedetails.push(this.detail);
+                  var index = this.details.findIndex(c => c.member.id == this.detail.id);
+                  this.details[index].status = "owe";
+                  this.details[index].amt = this.details[index].amt - this.allUserSettlement[i].amount;
+                  //this.owe = this.owe - this.allUserSettlement[i].amount;
+
+                }
+
+                if (this.id == this.allUserSettlement[i].payee.id) {
+                  this.detail = new GroupBalanceDetail();
+                  this.detail.detail = this.allUserSettlement[i].payer.name + " owes you " + this.allUserSettlement[i].amount;
+                  if (this.allUserSettlement[i].group == null) {
+                    this.detail.detail = this.detail.detail + " for " + "'" + "Non Group Expense" + "'";
+                  }
+                  else {
+                    this.detail.detail = this.detail.detail + " for " + "'" + this.allUserSettlement[i].group.name + "'";
+                  }
+                  this.detail.id = this.allUserSettlement[i].payer.id;
+                  this.oweddetails.push(this.detail);
+                  var index = this.details.findIndex(c => c.member.id == this.detail.id);
+                  this.details[index].status = "owes";
+                  this.details[index].amt = this.details[index].amt + this.allUserSettlement[i].amount;
+                  //this.owed = this.owed + this.allUserSettlement[i].amount;
+                }
+              }
+              
+             
+              
+            }
+            for (var i = 0; i < this.details.length; i++) {
+              if (this.details[i].amt > 0) {
+                this.owed = this.owed + this.details[i].amt;
+              }
+              else if (this.details[i].amt < 0) {
+                this.owe = this.owe + this.details[i].amt;
+              }
+            }
+            this.total = this.owed - (0 - this.owe);
+            this.owe = 0 - (this.owe);
+          });
+
+        console.log(this.details);
+        console.log(this.oweddetails);
+        console.log(this.owedetails);
         // console.log(this.friends)
       });
     this.user_service.getUserData(this.id)
@@ -83,6 +170,7 @@ export class DashboardComponent implements OnInit {
       });
     this.paidby = "Select Payer";
 
+    
   }
 
 
@@ -134,6 +222,7 @@ export class DashboardComponent implements OnInit {
     this.my_date = new Date().toLocaleString();
     this.settleUp.paid_on = this.my_date;
     this.bill_service.settleUp(this.settleUp).subscribe(data => console.log(data));
+    this.settleUp = null;
   }
 
 
@@ -240,7 +329,8 @@ export class DashboardComponent implements OnInit {
     if (this.payers.length == 0) {
       this.payers.push(this.payer);
     }
-    var div = this.addBill.total_amount / this.billShareWith.length;
+    var div = Number.parseFloat((this.addBill.total_amount / this.billShareWith.length).toFixed(2));
+    //div = Math.round(div);
     for (var i = 0; i < this.billShareWith.length; i++) {
       this.shareMember = new SharedWithResponse();
       this.shareMember.owes_amount = div;

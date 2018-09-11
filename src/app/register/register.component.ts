@@ -25,8 +25,9 @@ export class RegisterComponent implements OnInit {
         console.log(this.id)
         this.router.navigate(['/Board', this.id])
       },
-        error => {
-          alert("Incorrect check id or password")
+      error => {
+        alert("Id already exist. Plz user another id.")
+        this.user = new User();
       });
     console.log(this.id);
   }

@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../Services/UserService';
 import { FriendResponse, GroupMember, CreateGroupResponse } from '../Models/Model';
 import { GroupService } from '../Services/GroupService';
+import { FriendService } from '../Services/FriendService';
+import { HubConnectionService } from '../Services/HubService';
 
 
 @Component({
@@ -11,7 +13,8 @@ import { GroupService } from '../Services/GroupService';
   styleUrls: ['./create-group.component.css']
 })
 export class CreateGroupComponent implements OnInit {
-  constructor(private route: ActivatedRoute, private router: Router, public user_service: UserService, public group_service: GroupService) { }
+  constructor(private route: ActivatedRoute, private router: Router,
+    public friend_service: FriendService, private service: HubConnectionService,public user_service: UserService, public group_service: GroupService) { }
   pmid: any;
   //AddButton: boolean = false;
   //RemoveButton: boolean = true;
@@ -70,6 +73,18 @@ export class CreateGroupComponent implements OnInit {
     console.log(this.groupmemberid);
   }
 
+
+  //addFriends() {
+  //  for (var i = 0; i < this.groupmemberid.length; i++) {
+  //    for (var j = i + 1; j < this.groupmemberid.length; j++) {
+  //      this.friend_service.addFriend(this.groupmemberid[i].userid, this.groupmemberid[j].userid).
+  //        subscribe(data => console.log(data));
+  //    }
+  //  }
+  //}
+
+
+
   onSubmit() {
     this.newGroup.group_created_by = this.pmid;
     this.newGroup.groupMembers = this.groupmemberid;
@@ -77,6 +92,8 @@ export class CreateGroupComponent implements OnInit {
     console.log(this.newGroup);
     this.group_service.CreateGroup(this.newGroup)
       .subscribe(data => console.log(data));
+    // this.addFriends();
+    this.service.update();
     this.router.navigate(['/Board', this.pmid])
   }
   //addclick() {

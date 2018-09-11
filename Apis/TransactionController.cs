@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -122,7 +122,25 @@ namespace FinalSplitWise.Apis
             }
         }
 
-        [Route("api/settlements/{userid}/{friendid}")]
+    [Route("api/userSettlements/{userid}")]
+    [HttpGet("{userid}")]
+    [ProducesResponseType(typeof(List<GetSettlementResponse>), 200)]
+    [ProducesResponseType(typeof(CommonResponse), 400)]
+    public async Task<ActionResult> usersettlements(int userid)
+    {
+      try
+      {
+        var exp = await _transactionData.getUserSettlements(userid);
+        return Ok(exp);
+      }
+      catch (Exception exp)
+      {
+        _Logger.LogError(exp.Message);
+        return BadRequest(new CommonResponse { Status = false });
+      }
+    }
+
+    [Route("api/settlements/{userid}/{friendid}")]
         [HttpGet("{userid}/{friendid}")]
         [ProducesResponseType(typeof(List<GetSettlementResponse>), 200)]
         [ProducesResponseType(typeof(CommonResponse), 400)]
