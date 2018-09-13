@@ -73,8 +73,8 @@ namespace FinalSplitWise.Repositories
                 sharedWith.shared_withId = x.shared_withId;
                 sharedWith.owes_amount = x.owes_amount;
                 _Context.sharedWiths.Add(sharedWith);
-
-                try
+         
+        try
                 {
                     await _Context.SaveChangesAsync();
                 }
@@ -108,13 +108,25 @@ namespace FinalSplitWise.Repositories
                        && c.payeeId == x.payerId && c.payerId == x.payeeId);
                         if (settlements != null)
                         {
-                            settlements.payerId = x.payeeId;
-                            settlements.payeeId = x.payerId;
-                            settlements.amount = settlements.amount - x.paid_amount;
-                            settlements.groupId = billResponse.groupId;
-                            _Context.settlements.Attach(settlements);
-                            _Context.Entry(settlements).State = EntityState.Modified;
-                        }
+              if (settlements.amount > x.paid_amount)
+              {
+                settlements.payerId = x.payeeId;
+                settlements.payeeId = x.payerId;
+                settlements.groupId = billResponse.groupId;
+                settlements.amount = settlements.amount - x.paid_amount;
+                _Context.settlements.Attach(settlements);
+                _Context.Entry(settlements).State = EntityState.Modified;
+              }
+              else
+              {
+                settlements.payerId = x.payerId;
+                settlements.payeeId = x.payeeId;
+                settlements.groupId = billResponse.groupId;
+                settlements.amount = x.paid_amount - settlements.amount;
+                _Context.settlements.Attach(settlements);
+                _Context.Entry(settlements).State = EntityState.Modified;
+              }
+            }
                         else
                         {
                             Settlements settlements1 = new Settlements();
@@ -188,7 +200,36 @@ namespace FinalSplitWise.Repositories
                 }
             }
 
-            return bill;
+      for (int i = 0; i < billResponse.sharedwiths.Count; i++)
+      {
+        for (int j = i + 1; j < billResponse.sharedwiths.Count; j++)
+        {
+          Friend friend = new Friend();
+
+          var frdexist = _Context.friends.SingleOrDefault(
+          c => (c.userId == billResponse.sharedwiths[i].shared_withId && c.friendId == billResponse.sharedwiths[j].shared_withId)
+          || (c.userId == billResponse.sharedwiths[j].shared_withId && c.friendId == billResponse.sharedwiths[i].shared_withId));
+          if (frdexist == null)
+          {
+            friend.friendId = billResponse.sharedwiths[j].shared_withId;
+            friend.userId = billResponse.sharedwiths[i].shared_withId;
+
+            _Context.friends.Add(friend);
+            try
+            {
+              await _Context.SaveChangesAsync();
+            }
+            catch (Exception exp)
+            {
+              _Logger.LogError($"Error in {nameof(AddNewBillAsync)}: " + exp.Message);
+            }
+          }
+        }
+
+      }
+
+
+      return bill;
         }
         
         public async Task<bool> DeleteBillAsync(int id)

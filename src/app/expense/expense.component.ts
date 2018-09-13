@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../Services/UserService';
 import { BillService } from '../Services/BillService';
-import { TransactionGetResponse, BillGetResponse } from '../Models/Model';
+import { TransactionGetResponse, BillGetResponse, GetSettlementResponse } from '../Models/Model';
 
 @Component({
   selector: 'app-expense',
@@ -15,7 +15,8 @@ export class ExpenseComponent implements OnInit {
   userid: number;
   transactions: TransactionGetResponse[];
   bills: BillGetResponse[];
-
+  allUserSettlement: GetSettlementResponse[];
+  total: number = 0;
   ngOnInit() {
     this.route.parent.params.subscribe(params => {
       this.userid = params['id']
@@ -25,6 +26,20 @@ export class ExpenseComponent implements OnInit {
 
     this.bill_service.getUserBills(this.userid)
       .subscribe((data: BillGetResponse[]) => this.bills = data);
+
+    this.bill_service.getUserSettlements(this.userid)
+      .subscribe((data: GetSettlementResponse[]) => {
+        this.allUserSettlement = data;
+        for (var i = 0; i < this.allUserSettlement.length; i++) {
+          if (this.allUserSettlement[i].payee.id == this.userid) {
+            this.total = this.total + this.allUserSettlement[i].amount;
+          }
+          else if (this.allUserSettlement[i].payer.id == this.userid) {
+            this.total = this.total - this.allUserSettlement[i].amount;
+          }
+        }
+        console.log(this.total);
+      });
   }
 
 }

@@ -1,6 +1,6 @@
 <div class="row full">
 
-  <div class="col-lg-8 border-right border-dark">
+  <div class="col-lg-8 border-right">
     <div class="navbar navbar-expand-sm">
       <h3>{{ group.group_name }}</h3>
       <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#GroupBillModal" style="position:absolute;left:600px">Add Bill</button>
@@ -12,38 +12,38 @@
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Add Bill with {{ group.group_name }}</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <button type="button" class="close" data-dismiss="modal" #closeModal>&times;</button>
             </div>
             <div class="modal-body">
-              <form class="form" novalidate>
+              <form class="form" #myform="ngForm" novalidate>
 
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
-                    <input type="text" class="form-control" name="description" [(ngModel)]="addBill.description" placeholder="Description" />
+                    <input type="text" class="form-control" name="description" [(ngModel)]="addBill.description" placeholder="Description" required/>
                   </div>
                 </div>
 
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
-                    <input type="text" class="form-control" name="amount" [(ngModel)]="addBill.total_amount" placeholder="00.00" />
+                    <input type="text" class="form-control" name="amount" [(ngModel)]="addBill.total_amount" placeholder="00.00" required/>
                   </div>
                 </div>
 
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                    <input type="text" class="form-control" name="date" [(ngModel)]="addBill.bill_date" placeholder="MM-DD-YY" />
+                    <input type="text" class="form-control" name="date" [(ngModel)]="addBill.bill_date" placeholder="MM-DD-YY" required/>
                   </div>
                 </div>
 
                 <div>
                   Paid By
-                  <a style="background-color:lightgray;border-radius:5px;font-weight:bold;min-height:10px" data-toggle="modal" data-target="#GroupBillPayer">{{ paidby }}</a>
+                  <a role="button" style="background-color:lightgray;border-radius:5px;font-weight:bold;min-height:10px" data-toggle="modal" data-target="#GroupBillPayer">{{ paidby }}</a>
                 </div>
                 <div>
-                  <button type="button" (click)="AddBillData()" class="btn btn-success" data-dismiss="modal">Add</button>
+                  <button type="button" (click)="AddBillData()" class="btn btn-success" [disabled]="!myform.valid">Add</button>
                 </div>
               </form>
             </div>
@@ -58,7 +58,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Choose Payer</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <button type="button" class="close" data-dismiss="modal" #closePayerModal>&times;</button>
             </div>
             <div class="modal-body myscroll">
               <div class="payerlist">
@@ -103,15 +103,15 @@
 
         </div>
         <div id="set" class="panel-collapse collapse">
-          <div class="panel-body">
+          <div class="panel-body" *ngIf="transactions && transactions.length">
 
             <div class="billNav" *ngFor="let settle of transactions">
               <!--<div class="panel-group">-->
               <div class="panel panel-default">
                 <div class="panel-heading">
                   <!--<div class="date"> "Aug"
-                <div class="number">31</div>
-                </div>-->
+          <div class="number">31</div>
+          </div>-->
                   <div class="row">
                     <div class="col-lg-1 design1">
                       {{ settle.paid_on | date:'MMM'}}
@@ -130,18 +130,21 @@
 
                 </div>
                 <!--<div id="" class="panel-collapse collapse">
-                <div class="panel-body border-bottom">
-                  <br />
-                 fjklf
-                </div>
+          <div class="panel-body border-bottom">
+            <br />
+           fjklf
+          </div>
 
-              </div>-->
+        </div>-->
                 <!--</div>-->
               </div>
             </div>
 
 
 
+          </div>
+          <div class="panel-body" *ngIf="!transactions || !transactions.length">
+            No settlement exist
           </div>
         </div>
       </div>

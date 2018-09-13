@@ -40,8 +40,35 @@ namespace FinalSplitWise.Repositories
             {
                 _Logger.LogError($"Error in {nameof(AddGroupMemberAsync)}: " + exp.Message);
             }
+      //for (int i = 0; i < group1.groupMembers.Count; i++)
+      //{
+      //  for (int j = i + 1; j < group1.groupMembers.Count; j++)
+      //  {
+      var grpmem = _Context.groupMembers.Where(c => c.groupId == group).ToList();
+      for(int i = 0; i < grpmem.Count; i++)
+      {
+        Friend friend = new Friend();
+        var frdexist = _Context.friends.SingleOrDefault(
+    c => (c.userId == user && c.friendId == grpmem[i].userId)
+    || (c.userId == grpmem[i].userId && c.friendId == user));
+        if (frdexist == null)
+        {
+          friend.friendId = grpmem[i].userId;
+          friend.userId = user;
 
-            return groupMember;
+          _Context.friends.Add(friend);
+          try
+          {
+            await _Context.SaveChangesAsync();
+          }
+          catch (Exception exp)
+          {
+            _Logger.LogError($"Error in {nameof(AddGroupMemberAsync)}: " + exp.Message);
+          }
+        }
+      }  
+       
+      return groupMember;
         }
 
         public async Task<bool> DeleteGroupMemberAsync(int user, int group)

@@ -1,12 +1,12 @@
 <div style="height:auto">
 
-  <button style="position:absolute;top:25px;left:1000px;width:100px" [routerLink]="['/home']" class="btn btn-info">logout</button>
+  <button style="position:absolute;top:25px;left:1000px;width:100px" (click)="logout()" class="btn btn-info">logout</button>
   <button class="btn btn-secondary" style="color:white;position:absolute;top:25px;left:1111px;width:100px" [routerLink]="['account/setting']">
     {{user.user_name}}
     <span class="glyphicon glyphicon-lg glyphicon-cog"></span>
   </button>
 
-  <div class="col-lg-2 border-right border-dark" style="height:550px;overflow-y:scroll">
+  <div class="col-lg-2" style="height:550px;overflow-y:scroll" role="scrollbar">
     <nav style=" width:190px" class="navbar flex-column">
       <div class="nav flex-column">
         <div class="nav-item">

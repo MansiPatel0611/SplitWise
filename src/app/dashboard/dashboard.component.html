@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-lg-8 border-right border-dark">
+  <div class="col-lg-8 border-right">
     <div class="navbar navbar-expand-sm">
       <h3>Dashboard</h3>
       <button type="button" class="btn btn-success btn-lg" style="position:absolute;left:500px" data-toggle="modal" data-target="#AddBill">Add Bill</button>
@@ -11,7 +11,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Add Bill</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <button type="button" class="close" data-dismiss="modal" #closeModal>&times;</button>
             </div>
             <div class="modal-body">
 
@@ -30,26 +30,26 @@
 
               </div>
 
-              <form class="form" novalidate>
+              <form class="form" #myform="ngForm" novalidate>
 
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
-                    <input type="text" class="form-control" [(ngModel)]="addBill.description" name="description" placeholder="Description" />
+                    <input type="text" class="form-control" [(ngModel)]="addBill.description" name="description" placeholder="Description" required/>
                   </div>
                 </div>
 
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
-                    <input type="text" class="form-control" [(ngModel)]="addBill.total_amount" name="amount" placeholder="00.00" />
+                    <input type="text" class="form-control" [(ngModel)]="addBill.total_amount" name="amount" placeholder="00.00" required/>
                   </div>
                 </div>
 
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                    <input type="text" class="form-control" [(ngModel)]="addBill.bill_date" name="date" placeholder="MM-DD-YY" />
+                    <input type="text" class="form-control" [(ngModel)]="addBill.bill_date" name="date" placeholder="MM-DD-YY" required/>
                   </div>
                 </div>
 
@@ -61,7 +61,7 @@
                   </button>
                 </div>
                 <div>
-                  <button type="button" (click)="AddBillData()" class="btn btn-success" data-dismiss="modal">Add</button>
+                  <button type="button" (click)="AddBillData()" class="btn btn-success" [disabled]="!myform.valid">Add</button>
                 </div>
               </form>
             </div>
@@ -79,7 +79,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Select Friends</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <button type="button" class="close" data-dismiss="modal" #closeFriendModal>&times;</button>
             </div>
             <div class="modal-body">
               <label class="nav-link" style="font-weight:normal"
@@ -99,7 +99,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Choose Payer</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <button type="button" class="close" data-dismiss="modal" #closePayerModal>&times;</button>
             </div>
             <div class="modal-body myscroll">
               <div class="payerlist">
@@ -141,7 +141,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Settle Up</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <button type="button" class="close" data-dismiss="modal" #closeSettleModal>&times;</button>
             </div>
             <div class="modal-body">
               <div *ngIf="showInfo">
@@ -164,7 +164,7 @@
                 <div>
                   <label style="position:relative;left:40px">{{ user.user_name}}</label>
                   <label style="position:relative;left:60px">paid</label>
-                  <label style="position:relative;left:80px"
+                  <label role="button" style="position:relative;left:80px"
                          data-toggle="modal" data-target="#friendListModal">{{ Pay_to }}</label>
                 </div>
                 <br />
@@ -183,7 +183,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button class="btn btn-success" data-dismiss="modal" (click)="addSettlement()">Save</button>
+              <button class="btn btn-success" (click)="addSettlement()">Save</button>
             </div>
           </div>
         </div>
@@ -198,7 +198,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Choose Groups</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <button type="button" class="close" data-dismiss="modal" #closeSettleGrpModal>&times;</button>
             </div>
             <div class="modal-body">
               <label class="nav-link" style="font-weight:normal" (click)="selectNonGroup()">
@@ -220,7 +220,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Choose Friends</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <button type="button" class="close" data-dismiss="modal" #closeSettleFriendModal>&times;</button>
             </div>
             <div class="modal-body">
               <label class="nav-link" style="font-weight:normal"
@@ -272,10 +272,10 @@
               </h4>
               you owe  {{ 0-(info.amt)}}
               <ul *ngFor="let detail of owedetails" style="color:red">
-                <li *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
+                <li class="list" *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
               </ul>
               <ul *ngFor="let detail of oweddetails" style="color:green">
-                <li *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
+                <li class="list" *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
               </ul>
             </div>
           </div>
@@ -291,10 +291,10 @@
               </h4>
               owes you {{ info.amt}}
               <ul *ngFor="let detail of owedetails" style="color:red">
-                <li *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
+                <li class="list" *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
               </ul>
               <ul *ngFor="let detail of oweddetails" style="color:green">
-                <li *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
+                <li class="list" *ngIf="detail.id==info.member.id">{{detail.detail}}</li>
               </ul>
             </div>
             </div>

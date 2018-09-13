@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FriendResponse, User, GetSettlementResponse, CreateGroupResponse, TransactionResponse, Detail, BillResponse, PayerResponse, SharedWithResponse, SettlementResponse, settle, GroupBalanceDetail, GroupBalance } from '../Models/Model';
+import { FriendResponse, User, GetSettlementResponse, CreateGroupResponse, TransactionResponse, Detail, BillResponse, PayerResponse, SharedWithResponse, SettlementResponse, settle, GroupBalanceDetail, GroupBalance, CommonResponse } from '../Models/Model';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../Services/UserService';
 import { GroupService } from '../Services/GroupService';
 import { BillService } from '../Services/BillService';
+import { ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,6 +16,12 @@ export class DashboardComponent implements OnInit {
   constructor(private route: ActivatedRoute, private user_service: UserService,
     private bill_service: BillService, private group_service: GroupService) { }
 
+  @ViewChild('closeModal') closeModal: ElementRef;
+  @ViewChild('closePayerModal') closePayerModal: ElementRef;
+  @ViewChild('closeFriendModal') closeFriendModal: ElementRef;
+  @ViewChild('closeSettleModal') closeSettleModal: ElementRef;
+  @ViewChild('closeSettleGrpModal') closeSettleGrpModal: ElementRef;
+  @ViewChild('closeSettleFriendModal') closeSettleFriendModal: ElementRef;
 
   public user = new User();
 
@@ -97,8 +104,8 @@ export class DashboardComponent implements OnInit {
 
         this.bill_service.getUserSettlements(this.id)
           .subscribe((data: GetSettlementResponse[]) => {
-            this.allUserSettlement = data,
-              console.log(this.allUserSettlement);
+            this.allUserSettlement = data;
+             // console.log(this.allUserSettlement);
             for (var i = 0; i < this.allUserSettlement.length; i++) {
 
               if (this.allUserSettlement[i].amount != 0) {
@@ -155,10 +162,10 @@ export class DashboardComponent implements OnInit {
             this.owe = 0 - (this.owe);
           });
 
-        console.log(this.details);
-        console.log(this.oweddetails);
-        console.log(this.owedetails);
-        // console.log(this.friends)
+        //console.log(this.details);
+        //console.log(this.oweddetails);
+        //console.log(this.owedetails);
+        //// console.log(this.friends)
       });
     this.user_service.getUserData(this.id)
       .subscribe((data: User) => {
@@ -221,7 +228,17 @@ export class DashboardComponent implements OnInit {
     this.settleUp.groupId = this.Pay_in;
     this.my_date = new Date().toLocaleString();
     this.settleUp.paid_on = this.my_date;
-    this.bill_service.settleUp(this.settleUp).subscribe(data => console.log(data));
+    this.bill_service.settleUp(this.settleUp)
+      .subscribe((data: CommonResponse) => {
+        if (data.status == true) {
+          alert("Settlement successful")
+        }
+        else ("Settlement Failed")
+      });
+    this.closeSettleModal.nativeElement.click();
+    this.closeSettleGrpModal.nativeElement.click();
+    this.closeSettleFriendModal.nativeElement.click();
+
     this.settleUp = null;
   }
 
@@ -230,11 +247,11 @@ export class DashboardComponent implements OnInit {
     this.bill_service.getFriendSettlements(this.id, this.Pay_to_Id)
       .subscribe((data: GetSettlementResponse[]) => {
         this.friendSettlement = data;
-     //   console.log(this.friendSettlement);
+        console.log(this.friendSettlement);
         if (this.friendSettlement != null) {
 
           var isSettlement = this.friendSettlement.find(c => c.group == null);
-          // console.log(isSettlement);
+           console.log(isSettlement);
           if (isSettlement != null) {
             if (isSettlement.payer.id == this.id)
               this.settleAmt = isSettlement.amount;
@@ -257,12 +274,13 @@ export class DashboardComponent implements OnInit {
     this.bill_service.getFriendSettlements(this.id, this.Pay_to_Id)
       .subscribe(
         (data: GetSettlementResponse[]) => {
-        
+          this.friendSettlement = data;
+
          console.log(this.friendSettlement);
           if (this.friendSettlement != null) {
             var isSettlement = this.friendSettlement.find(c => c.group != null && c.group.id == id);
             //this.isSett = this.friendSettlement.includes(c => c.group != null);
-            //console.log(isSettlement);
+            console.log(isSettlement);
             //var isSettlement = this.isSett.find(c => c.group.id == id);
           if (isSettlement != null) {
             if (isSettlement.payer.id == this.id)
@@ -321,157 +339,173 @@ export class DashboardComponent implements OnInit {
 
 
   AddBillData() {
-    this.my_date = new Date().toLocaleString();
-    this.addBill.bill_created_at = this.my_date;
-    this.addBill.bill_created_byId = this.id;
-    this.addBill.bill_updated_at = this.my_date;
-    this.addBill.bill_updated_byId = this.id;
-    if (this.payers.length == 0) {
-      this.payers.push(this.payer);
+    if (this.billShareWith.length == 1) {
+      alert("Please select member to share the bill");
     }
-    var div = Number.parseFloat((this.addBill.total_amount / this.billShareWith.length).toFixed(2));
-    //div = Math.round(div);
-    for (var i = 0; i < this.billShareWith.length; i++) {
-      this.shareMember = new SharedWithResponse();
-      this.shareMember.owes_amount = div;
-      this.shareMember.shared_withId = this.billShareWith[i].id;
-      this.shareMembers.push(this.shareMember);
-    }
-
-
-
-
-    if (this.payers.length == 1) {
-      var payee = this.payer.paid_byId;
-      for (var i = 0; i < this.shareMembers.length; i++) {
-        if (payee != this.shareMembers[i].shared_withId) {
-          var payer = this.shareMembers[i].shared_withId;
-          var amt = this.shareMembers[i].owes_amount;
-          this.settlement = new SettlementResponse();
-          this.settlement.payeeId = payee;
-          this.settlement.payerId = payer;
-          this.settlement.paid_amount = amt;
-          if (this.settlement.paid_amount != 0)
-            this.settlements.push(this.settlement);
-        }
-      }
+    else if (this.payer.paid_byId == null) {
+      alert("Please select payer");
     }
     else {
-      for (var i = 0; i < this.shareMembers.length; i++) {
-        this.sett = new settle();
 
-        this.sett.id = this.shareMembers[i].shared_withId;
-        var amt = 0;
-        for (var j = 0; j < this.payers.length; j++) {
-          if (this.shareMembers[i].shared_withId === this.payers[j].paid_byId) {
-            if (this.payers[j].amount_paid == div) {
-              amt = 1;
-            }
-            else if (this.payers[j].amount_paid > div) {
-              amt = this.payers[j].amount_paid - div;
-              this.sett.amt = amt;
-              this.setPayers.push(this.sett);
-            }
-
-            else {
-              amt = this.shareMembers[i].owes_amount - this.payers[j].amount_paid;
-              this.sett.amt = amt;
-              this.setShares.push(this.sett);
-            }
-          }
-        }
-        if (amt == 0) {
-          this.sett.amt = this.shareMembers[i].owes_amount;
-          this.setShares.push(this.sett);
-        }
+      this.my_date = new Date().toLocaleString();
+      this.addBill.bill_created_at = this.my_date;
+      this.addBill.bill_created_byId = this.id;
+      this.addBill.bill_updated_at = this.my_date;
+      this.addBill.bill_updated_byId = this.id;
+      if (this.payers.length == 0) {
+        this.payers.push(this.payer);
+      }
+      var div = Number.parseFloat((this.addBill.total_amount / this.billShareWith.length).toFixed(2));
+      //div = Math.round(div);
+      for (var i = 0; i < this.billShareWith.length; i++) {
+        this.shareMember = new SharedWithResponse();
+        this.shareMember.owes_amount = div;
+        this.shareMember.shared_withId = this.billShareWith[i].id;
+        this.shareMembers.push(this.shareMember);
       }
 
-      //console.log(this.setPayers);
-      //console.log(this.setShares);
 
 
-      if (this.setPayers.length > 1) {
 
-        if (this.setShares.length == 1) {
-          for (var i = 0; i < this.setPayers.length; i++) {
+      if (this.payers.length == 1) {
+        var payee = this.payer.paid_byId;
+        for (var i = 0; i < this.shareMembers.length; i++) {
+          if (payee != this.shareMembers[i].shared_withId) {
+            var payer = this.shareMembers[i].shared_withId;
+            var amt = this.shareMembers[i].owes_amount;
             this.settlement = new SettlementResponse();
-            this.settlement.payerId = this.setShares[0].id;
-            this.settlement.payeeId = this.setPayers[i].id;
-            this.settlement.paid_amount = this.setPayers[i].amt;
+            this.settlement.payeeId = payee;
+            this.settlement.payerId = payer;
+            this.settlement.paid_amount = amt;
             if (this.settlement.paid_amount != 0)
               this.settlements.push(this.settlement);
           }
         }
-        else {
-          for (var i = 0; i < this.setShares.length; i++) {
-            var mem = this.setPayers.find(data => data.amt === this.setShares[i].amt);
-            var index = this.setPayers.findIndex(data => data.amt === this.setShares[i].amt);
-            //console.log(index);
+      }
+      else {
+        for (var i = 0; i < this.shareMembers.length; i++) {
+          this.sett = new settle();
 
-            if (mem != null) {
+          this.sett.id = this.shareMembers[i].shared_withId;
+          var amt = 0;
+          for (var j = 0; j < this.payers.length; j++) {
+            if (this.shareMembers[i].shared_withId === this.payers[j].paid_byId) {
+              if (this.payers[j].amount_paid == div) {
+                amt = 1;
+              }
+              else if (this.payers[j].amount_paid > div) {
+                amt = this.payers[j].amount_paid - div;
+                this.sett.amt = amt;
+                this.setPayers.push(this.sett);
+              }
+
+              else {
+                amt = this.shareMembers[i].owes_amount - this.payers[j].amount_paid;
+                this.sett.amt = amt;
+                this.setShares.push(this.sett);
+              }
+            }
+          }
+          if (amt == 0) {
+            this.sett.amt = this.shareMembers[i].owes_amount;
+            this.setShares.push(this.sett);
+          }
+        }
+
+        //console.log(this.setPayers);
+        //console.log(this.setShares);
+
+
+        if (this.setPayers.length > 1) {
+
+          if (this.setShares.length == 1) {
+            for (var i = 0; i < this.setPayers.length; i++) {
               this.settlement = new SettlementResponse();
-              payer = this.setShares[i].id;
-              payee = mem.id;
-              amt = mem.amt;
-              this.setPayers[index].amt = this.setPayers[index].amt - amt;
-              this.settlement.payerId = payer;
-              this.settlement.payeeId = payee;
-              this.settlement.paid_amount = amt;
+              this.settlement.payerId = this.setShares[0].id;
+              this.settlement.payeeId = this.setPayers[i].id;
+              this.settlement.paid_amount = this.setPayers[i].amt;
               if (this.settlement.paid_amount != 0)
                 this.settlements.push(this.settlement);
             }
+          }
+          else {
+            for (var i = 0; i < this.setShares.length; i++) {
+              var mem = this.setPayers.find(data => data.amt === this.setShares[i].amt);
+              var index = this.setPayers.findIndex(data => data.amt === this.setShares[i].amt);
+              //console.log(index);
 
-            else {
-              for (var j = 0; j < this.setPayers.length; j++) {
-                if (this.setPayers[j].amt > this.setShares[i].amt) {
-                  this.settlement = new SettlementResponse();
-                  this.settlement.payerId = this.setShares[i].id;
-                  this.settlement.payeeId = this.setPayers[j].id;
-                  this.settlement.paid_amount = this.setShares[i].amt;
-                  this.setShares[i].amt = this.setShares[i].amt - this.settlement.paid_amount;
-                  this.setPayers[j].amt = this.setPayers[j].amt - this.settlement.paid_amount;
-                  if (this.settlement.paid_amount != 0)
-                    this.settlements.push(this.settlement);
-                }
-                else if (this.setPayers[j].amt > 0) {
-                  this.settlement = new SettlementResponse();
-                  this.settlement.payerId = this.setShares[i].id;
-                  this.settlement.payeeId = this.setPayers[j].id;
-                  this.settlement.paid_amount = this.setPayers[j].amt;
-                  this.setShares[i].amt = this.setShares[i].amt - this.settlement.paid_amount;
-                  this.setPayers[j].amt = this.setPayers[j].amt - this.settlement.paid_amount;
-                  if (this.settlement.paid_amount != 0)
-                    this.settlements.push(this.settlement);
+              if (mem != null) {
+                this.settlement = new SettlementResponse();
+                payer = this.setShares[i].id;
+                payee = mem.id;
+                amt = mem.amt;
+                this.setPayers[index].amt = this.setPayers[index].amt - amt;
+                this.settlement.payerId = payer;
+                this.settlement.payeeId = payee;
+                this.settlement.paid_amount = amt;
+                if (this.settlement.paid_amount != 0)
+                  this.settlements.push(this.settlement);
+              }
+
+              else {
+                for (var j = 0; j < this.setPayers.length; j++) {
+                  if (this.setPayers[j].amt > this.setShares[i].amt) {
+                    this.settlement = new SettlementResponse();
+                    this.settlement.payerId = this.setShares[i].id;
+                    this.settlement.payeeId = this.setPayers[j].id;
+                    this.settlement.paid_amount = this.setShares[i].amt;
+                    this.setShares[i].amt = this.setShares[i].amt - this.settlement.paid_amount;
+                    this.setPayers[j].amt = this.setPayers[j].amt - this.settlement.paid_amount;
+                    if (this.settlement.paid_amount != 0)
+                      this.settlements.push(this.settlement);
+                  }
+                  else if (this.setPayers[j].amt > 0) {
+                    this.settlement = new SettlementResponse();
+                    this.settlement.payerId = this.setShares[i].id;
+                    this.settlement.payeeId = this.setPayers[j].id;
+                    this.settlement.paid_amount = this.setPayers[j].amt;
+                    this.setShares[i].amt = this.setShares[i].amt - this.settlement.paid_amount;
+                    this.setPayers[j].amt = this.setPayers[j].amt - this.settlement.paid_amount;
+                    if (this.settlement.paid_amount != 0)
+                      this.settlements.push(this.settlement);
+                  }
                 }
               }
             }
           }
         }
-      }
-      else if (this.setPayers.length == 1) {
-        for (var i = 0; i < this.setShares.length; i++) {
-          this.settlement = new SettlementResponse();
-          this.settlement.payerId = this.setShares[i].id;
-          this.settlement.payeeId = this.setPayers[0].id;
-          this.settlement.paid_amount = this.setShares[i].amt;
-          if (this.settlement.paid_amount != 0)
-            this.settlements.push(this.settlement);
+        else if (this.setPayers.length == 1) {
+          for (var i = 0; i < this.setShares.length; i++) {
+            this.settlement = new SettlementResponse();
+            this.settlement.payerId = this.setShares[i].id;
+            this.settlement.payeeId = this.setPayers[0].id;
+            this.settlement.paid_amount = this.setShares[i].amt;
+            if (this.settlement.paid_amount != 0)
+              this.settlements.push(this.settlement);
+          }
         }
+
+
+        //console.log(this.setPayers);
+        //console.log(this.setShares);
+
       }
-
-
-      //console.log(this.setPayers);
-      //console.log(this.setShares);
-
+      this.addBill.payers = this.payers;
+      this.addBill.sharedwiths = this.shareMembers;
+      this.addBill.settlements = this.settlements;
+      console.log(this.addBill);
+      this.bill_service.addNewBill(this.addBill)
+        .subscribe((data: CommonResponse) => {
+          if (data.status == true) {
+            alert("Bill Added Successfully")
+          }
+          else ("Failed to add the bill")
+        });
+      this.closeModal.nativeElement.click();
+      this.closePayerModal.nativeElement.click();
+      this.closeFriendModal.nativeElement.click();
     }
-    this.addBill.payers = this.payers;
-    this.addBill.sharedwiths = this.shareMembers;
-    this.addBill.settlements = this.settlements;
-    console.log(this.addBill);
-    this.bill_service.addNewBill(this.addBill)
-      .subscribe(data => console.log(data));
   }
-
 }
 
 
