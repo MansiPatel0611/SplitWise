@@ -1,10 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../Services/UserService';
-import { FriendResponse, GroupMember, CreateGroupResponse } from '../Models/Model';
+import { FriendResponse, GroupMember, CreateGroupResponse, GroupResponse } from '../Models/Model';
 import { GroupService } from '../Services/GroupService';
 import { FriendService } from '../Services/FriendService';
 import { HubConnectionService } from '../Services/HubService';
+import { error } from '@angular/compiler/src/util';
 
 
 @Component({
@@ -91,10 +92,15 @@ export class CreateGroupComponent implements OnInit {
     this.newGroup.is_simplified_depts = false;
     console.log(this.newGroup);
     this.group_service.CreateGroup(this.newGroup)
-      .subscribe(data => console.log(data));
+      .subscribe(
+      (data: GroupResponse) => {
+        console.log(data),
+          alert("Success"),
+          this.router.navigate(['/Board', this.pmid])
+      },
+      error => alert("failed to create the group"));
     // this.addFriends();
-    this.service.update();
-    this.router.navigate(['/Board', this.pmid])
+    //this.service.update();
   }
   //addclick() {
   // // console.log(friend);

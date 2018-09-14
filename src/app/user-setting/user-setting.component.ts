@@ -25,6 +25,7 @@ export class UserSettingComponent implements OnInit {
   onSubmit() {
     this.user_service.updateUser(this.user).subscribe(
       (data: User) => {
+        alert("User data updated"),
         this.user = data
       },
       error =>
