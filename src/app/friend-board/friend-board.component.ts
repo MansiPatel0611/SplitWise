@@ -143,6 +143,7 @@ export class FriendBoardComponent implements OnInit {
             this.friend_service.removeFriend(this.userid, this.id)
               .subscribe((data: CommonResponse) => {
                 console.log(data),
+                  alert("Delete Successfull"),
                   this.router.navigate(['/Board', this.userid])
               },
                 error => alert("cannot delete friend"));

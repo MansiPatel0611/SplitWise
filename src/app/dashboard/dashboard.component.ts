@@ -234,7 +234,8 @@ export class DashboardComponent implements OnInit {
           alert("Settlement successful")
         }
         else ("Settlement Failed")
-      });
+      },
+      error => alert("failed"));
     this.closeSettleModal.nativeElement.click();
     this.closeSettleGrpModal.nativeElement.click();
     this.closeSettleFriendModal.nativeElement.click();

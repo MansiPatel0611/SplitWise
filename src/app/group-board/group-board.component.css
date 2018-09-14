@@ -21,9 +21,9 @@ div.navbar1{
 div.billNav{
   background-color:whitesmoke;
 }
-label.billNav1.nav-link:hover{
+/*label.billNav1.nav-link:hover{
   background-color:lightgray;
-}
+}*/
 .design{
   vertical-align:middle;
   text-align:center;
@@ -44,7 +44,7 @@ label.nav-link{
 }
 
 label.nav-link:hover{
-  background-color:gray;
+  background-color:lightgray;
   color:black;
 }
 label.nav-link:active{

@@ -30,6 +30,10 @@ div.billNav{
 label.billNav1.nav-link:hover{
   background-color:lightgray;
 }
+label.nav-link:hover{
+  background-color:lightgray;
+  color:black;
+}
 .myscroll.modal-body {
   min-height:initial;
   max-height:300px;

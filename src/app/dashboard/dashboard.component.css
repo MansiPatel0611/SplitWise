@@ -17,8 +17,12 @@ label.nav-link{
   background-color:whitesmoke;
   color:grey
 }
-.detail{
+label.nav-link:hover{
   background-color:lightgray;
+  color:black;
+}
+.detail{
+  background-color:whitesmoke;
   height:50px;
 }
 .modal{

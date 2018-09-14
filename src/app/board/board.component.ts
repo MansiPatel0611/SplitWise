@@ -47,8 +47,9 @@ export class BoardComponent implements OnInit {
       .subscribe(
       (data: CommonResponse) => {
         console.log(data),
-          this.Label="hide"
-        //  this.router.navigate(['/Board', this.id])
+          this.Label = "hide",
+          alert("Successfully Added a new friend"),
+          this.router.navigate(['/Board', this.id])
       },
       error => {
         alert("user does not exist");
